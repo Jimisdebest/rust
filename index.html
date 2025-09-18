@@ -2,26 +2,23 @@
 <html lang="nl">
 <head>
   <meta charset="UTF-8">
-  <title>Bing Wallpaper Viewer</title>
+  <title>Wallpaper Viewer</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <img id="image" src="" alt="Bing Wallpaper">
+  <img id="image" src="" alt="Wallpaper">
   <div id="overlay">
     <div id="clock"></div>
     <div id="date"></div>
   </div>
 
   <script>
-    const images = [
-      "BingWallpaper (1).jpg",
-      "BingWallpaper (2).jpg"
-    ];
-    const resyPath = "resy/";
+    const images = ["1.jpg", "2.jpg"];
+    const imagePath = "resy/";
 
     function showRandomImage() {
       const randomImage = images[Math.floor(Math.random() * images.length)];
-      document.getElementById("image").src = resyPath + randomImage;
+      document.getElementById("image").src = imagePath + randomImage;
     }
 
     function updateClock() {
