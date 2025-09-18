@@ -1,0 +1,40 @@
+/* style.css */
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background-color: black;
+  overflow: hidden;
+  height: 100%;
+  width: 100%;
+  font-family: Arial, sans-serif;
+}
+
+#image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  object-fit: cover;
+  z-index: 0;
+}
+
+#overlay {
+  position: absolute;
+  bottom: 20px;
+  right: 30px;
+  color: white;
+  text-align: right;
+  z-index: 1;
+}
+
+#clock {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+#date {
+  font-size: 14px;
+  opacity: 0.8;
+}
