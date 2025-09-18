@@ -2,7 +2,7 @@
 <html lang="nl">
 <head>
   <meta charset="UTF-8">
-  <title>Standby</title>
+  <title>Wallpaper Viewer met Weer</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -12,7 +12,7 @@
   <!-- Achtergrondafbeelding -->
   <img id="image" src="" alt="Wallpaper">
 
-  <!-- Overlay rechtsboven -->
+  <!-- Overlay rechtsboven: weer boven, tijd groot, datum kleiner eronder -->
   <div id="overlay-top">
     <div id="weather" class="weather">Weer laden…</div>
     <div id="timeblock">
@@ -22,11 +22,15 @@
   </div>
 
   <script>
-    const maxImages = 20;
-    const imagePath = "";
+    // Config
+    const maxImages = 20;              // Verhoog als je meer 3.jpg, 4.jpg, enz. toevoegt
+    const imagePath = "";              // Root
     const images = Array.from({ length: maxImages }, (_, i) => `${i + 1}.jpg`);
+
+    // Elementen
     const imageElement = document.getElementById("image");
 
+    // Afbeelding tonen met fallback en fade
     function showRandomImage() {
       const randomImage = images[Math.floor(Math.random() * images.length)];
       const fullPath = imagePath + randomImage;
@@ -34,16 +38,18 @@
       const testImage = new Image();
       testImage.onload = () => {
         imageElement.classList.remove("fade-in");
-        void imageElement.offsetWidth;
+        void imageElement.offsetWidth; // force reflow
         imageElement.src = fullPath;
         imageElement.classList.add("fade-in");
       };
       testImage.onerror = () => {
+        // Probeer direct een andere
         showRandomImage();
       };
       testImage.src = fullPath;
     }
 
+    // Klok en datum
     function updateClock() {
       const now = new Date();
       const time = now.toLocaleTimeString("nl-NL", {
@@ -61,9 +67,10 @@
       document.getElementById("date").textContent = date;
     }
 
+    // Weer (Open-Meteo, geen sleutel nodig)
     async function updateWeather() {
       try {
-        const lat = 52.237;
+        const lat = 52.237; // Noordwijk-Binnen
         const lon = 4.444;
         const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&timezone=Europe%2FAmsterdam`;
 
@@ -79,10 +86,8 @@
         const wind = Math.round(data.current_weather.windspeed);
         const weatherCode = data.current_weather.weathercode;
         const description = getWeatherDescription(weatherCode);
-        const iconSVG = getWeatherIconSVG(weatherCode);
 
-        document.getElementById("weather").innerHTML =
-          `${iconSVG}<span>${temp}°C • ${description} • wind ${wind} km/u</span>`;
+        document.getElementById("weather").textContent = `${temp}°C • ${description} • wind ${wind} km/u`;
       } catch {
         document.getElementById("weather").textContent = "Weer niet beschikbaar";
       }
@@ -90,26 +95,26 @@
 
     function getWeatherDescription(code) {
       const codes = {
-        0: "Helder", 1: "Overwegend helder", 2: "Deels bewolkt", 3: "Bewolkt",
-        45: "Mist", 48: "Mist met rijp", 51: "Lichte motregen", 53: "Motregen",
-        55: "Zware motregen", 61: "Lichte regen", 63: "Regen", 65: "Zware regen",
-        71: "Lichte sneeuw", 73: "Sneeuw", 75: "Zware sneeuw",
-        80: "Lichte buien", 81: "Buien", 82: "Zware buien"
+        0: "Helder",
+        1: "Overwegend helder",
+        2: "Deels bewolkt",
+        3: "Bewolkt",
+        45: "Mist",
+        48: "Mist met rijp",
+        51: "Lichte motregen",
+        53: "Motregen",
+        55: "Zware motregen",
+        61: "Lichte regen",
+        63: "Regen",
+        65: "Zware regen",
+        71: "Lichte sneeuw",
+        73: "Sneeuw",
+        75: "Zware sneeuw",
+        80: "Lichte buien",
+        81: "Buien",
+        82: "Zware buien"
       };
       return codes[code] || "Onbekend weer";
-    }
-
-    function getWeatherIconSVG(code) {
-      const icons = {
-        0: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="yellow" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><g stroke="yellow" stroke-width="2"><line x1="12" y1="1" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="6.34" y2="6.34"/><line x1="17.66" y1="17.66" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="6.34" y2="17.66"/><line x1="17.66" y1="6.34" x2="19.78" y2="4.22"/></g></svg>`,
-        1: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="yellow" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/></svg>`,
-        2: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="gray" viewBox="0 0 24 24"><ellipse cx="12" cy="14" rx="10" ry="6"/></svg>`,
-        3: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="gray" viewBox="0 0 24 24"><ellipse cx="12" cy="12" rx="10" ry="6"/></svg>`,
-        61: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="gray" viewBox="0 0 24 24"><ellipse cx="12" cy="10" rx="10" ry="6"/><line x1="8" y1="18" x2="8" y2="22" stroke="blue" stroke-width="2"/><line x1="16" y1="18" x2="16" y2="22" stroke="blue" stroke-width="2"/></svg>`,
-        63: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="gray" viewBox="0 0 24 24"><ellipse cx="12" cy="10" rx="10" ry="6"/><line x1="8" y1="18" x2="8" y2="22" stroke="blue" stroke-width="2"/><line x1="12" y1="18" x2="12" y2="22" stroke="blue" stroke-width="2"/><line x1="16" y1="18" x2="16" y2="22" stroke="blue" stroke-width="2"/></svg>`,
-        71: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="lightblue" viewBox="0 0 24 24"><ellipse cx="12" cy="10" rx="10" ry="6"/><text x="6" y="20" font-size="8" fill="white">*</text><text x="12" y="20" font-size="8" fill="white">*</text></svg>`
-      };
-      return icons[code] || `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="white" viewBox="0 0 24 24"><text x="4" y="16" font-size="12">?</text></svg>`;
     }
 
     function enterFullscreen() {
@@ -119,19 +124,16 @@
       else if (docEl.msRequestFullscreen) docEl.msRequestFullscreen();
     }
 
-    function scheduleImageChangeOnMinute() {
-      const now = new Date();
-      const msToNextMinute = (60 - now.getSeconds()) * 1000 - now.getMilliseconds();
-      setTimeout(() => {
-        showRandomImage();
-        scheduleImageChangeOnMinute();
-      }, msToNextMinute);
-    }
-
     window.onload = () => {
       showRandomImage();
       updateClock();
       updateWeather();
       enterFullscreen();
-      scheduleImageChangeOnMinute();
-      setInterval(updateClock, 1000
+
+      setInterval(showRandomImage, 60000);  // elke minuut
+      setInterval(updateClock, 1000);       // elke seconde
+      setInterval(updateWeather, 600000);   // elke 10 min
+    };
+  </script>
+</body>
+</html>
