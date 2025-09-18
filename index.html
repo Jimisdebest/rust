@@ -2,21 +2,18 @@
 <html lang="nl">
 <head>
   <meta charset="UTF-8">
-  <title>Wallpaper Viewer met Weer</title>
+  <title>Standby</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <!-- Laadscherm -->
-  <div id="loader">Laden...</div>
-
   <!-- Achtergrondmuziek -->
   <audio id="bg-music" src="achtergrondmuziekje.mp3" autoplay loop></audio>
 
   <!-- Achtergrondafbeelding -->
-  <img id="image" src="" alt="Wallpaper" style="display:none;">
+  <img id="image" src="" alt="Wallpaper">
 
   <!-- Overlay rechtsboven -->
-  <div id="overlay-top" style="display:none;">
+  <div id="overlay-top">
     <div id="weather" class="weather">Weer laden…</div>
     <div id="timeblock">
       <div id="clock" class="clock"></div>
@@ -29,20 +26,20 @@
     const imagePath = "";
     const images = Array.from({ length: maxImages }, (_, i) => `${i + 1}.jpg`);
     const imageElement = document.getElementById("image");
-    const loader = document.getElementById("loader");
-    const overlayTop = document.getElementById("overlay-top");
 
-    function showRandomImage(callback) {
+    function showRandomImage() {
       const randomImage = images[Math.floor(Math.random() * images.length)];
       const fullPath = imagePath + randomImage;
 
       const testImage = new Image();
       testImage.onload = () => {
+        imageElement.classList.remove("fade-in");
+        void imageElement.offsetWidth;
         imageElement.src = fullPath;
-        if (callback) callback();
+        imageElement.classList.add("fade-in");
       };
       testImage.onerror = () => {
-        showRandomImage(callback);
+        showRandomImage();
       };
       testImage.src = fullPath;
     }
@@ -123,4 +120,18 @@
     }
 
     function scheduleImageChangeOnMinute() {
-      const now = new Date
+      const now = new Date();
+      const msToNextMinute = (60 - now.getSeconds()) * 1000 - now.getMilliseconds();
+      setTimeout(() => {
+        showRandomImage();
+        scheduleImageChangeOnMinute();
+      }, msToNextMinute);
+    }
+
+    window.onload = () => {
+      showRandomImage();
+      updateClock();
+      updateWeather();
+      enterFullscreen();
+      scheduleImageChangeOnMinute();
+      setInterval(updateClock, 1000
