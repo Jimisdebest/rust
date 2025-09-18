@@ -19,53 +19,68 @@
   </div>
 
   <script>
-    const images = ["1.jpg", "2.jpg"];
-    const imagePath = "";
-    const imageElement = document.getElementById("image");
+  const maxImages = 20; // stel in tot hoeveel jpg-bestanden je hebt
+  const imagePath = "";
+  const imageElement = document.getElementById("image");
 
-    function showRandomImage() {
+  // Genereer lijst van bestandsnamen: 1.jpg t/m maxImages.jpg
+  const images = Array.from({ length: maxImages }, (_, i) => `${i + 1}.jpg`);
+
+  function showRandomImage() {
+    const randomImage = images[Math.floor(Math.random() * images.length)];
+    const fullPath = imagePath + randomImage;
+
+    // Probeer afbeelding te laden
+    const testImage = new Image();
+    testImage.onload = () => {
       imageElement.classList.remove("fade-in");
-      void imageElement.offsetWidth; // Force reflow
-      const randomImage = images[Math.floor(Math.random() * images.length)];
-      imageElement.src = imagePath + randomImage;
+      void imageElement.offsetWidth; // force reflow
+      imageElement.src = fullPath;
       imageElement.classList.add("fade-in");
-    }
-
-    function updateClock() {
-      const now = new Date();
-      const time = now.toLocaleTimeString("nl-NL", {
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit'
-      });
-      const date = now.toLocaleDateString("nl-NL", {
-        weekday: 'long',
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-      });
-      document.getElementById("clock").textContent = time;
-      document.getElementById("date").textContent = date;
-    }
-
-    function enterFullscreen() {
-      const docEl = document.documentElement;
-      if (docEl.requestFullscreen) {
-        docEl.requestFullscreen();
-      } else if (docEl.webkitRequestFullscreen) {
-        docEl.webkitRequestFullscreen();
-      } else if (docEl.msRequestFullscreen) {
-        docEl.msRequestFullscreen();
-      }
-    }
-
-    window.onload = () => {
-      showRandomImage();
-      updateClock();
-      enterFullscreen();
-      setInterval(showRandomImage, 60000); // elke minuut
-      setInterval(updateClock, 1000);      // elke seconde
     };
-  </script>
+    testImage.onerror = () => {
+      // Als afbeelding niet bestaat, probeer opnieuw
+      showRandomImage();
+    };
+    testImage.src = fullPath;
+  }
+
+  function updateClock() {
+    const now = new Date();
+    const time = now.toLocaleTimeString("nl-NL", {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit'
+    });
+    const date = now.toLocaleDateString("nl-NL", {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+    document.getElementById("clock").textContent = time;
+    document.getElementById("date").textContent = date;
+  }
+
+  function enterFullscreen() {
+    const docEl = document.documentElement;
+    if (docEl.requestFullscreen) {
+      docEl.requestFullscreen();
+    } else if (docEl.webkitRequestFullscreen) {
+      docEl.webkitRequestFullscreen();
+    } else if (docEl.msRequestFullscreen) {
+      docEl.msRequestFullscreen();
+    }
+  }
+
+  window.onload = () => {
+    showRandomImage();
+    updateClock();
+    enterFullscreen();
+    setInterval(showRandomImage, 60000); // elke minuut
+    setInterval(updateClock, 1000);      // elke seconde
+  };
+</script>
+
 </body>
 </html>
