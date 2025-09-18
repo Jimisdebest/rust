@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <title>Resy Viewer</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background-color: black;
+      overflow: hidden;
+      height: 100%;
+      width: 100%;
+    }
+
+    #image {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      object-fit: cover;
+      z-index: 0;
+    }
+
+    #overlay {
+      position: absolute;
+      bottom: 20px;
+      right: 30px;
+      color: white;
+      font-family: Arial, sans-serif;
+      text-align: right;
+      z-index: 1;
+    }
+
+    #clock {
+      font-size: 24px;
+    }
+
+    #date {
+      font-size: 14px;
+      opacity: 0.8;
+    }
+  </style>
+</head>
+<body>
+  <img id="image" src="" alt="Random Image">
+  <div id="overlay">
+    <div id="clock"></div>
+    <div id="date"></div>
+  </div>
+
+  <script>
+    // Vul hier je afbeeldingsnamen in
+    const images = [
+      "image1.jpg",
+      "image2.jpg",
+      "image3.jpg",
+      "image4.jpg"
+    ];
+    const resyPath = "resy/";
+
+    function showRandomImage() {
+      const randomImage = images[Math.floor(Math.random() * images.length)];
+      document.getElementById("image").src = resyPath + randomImage;
+    }
+
+    function updateClock() {
+      const now = new Date();
+      const time = now.toLocaleTimeString("nl-NL", { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      const date = now.toLocaleDateString("nl-NL", { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+      document.getElementById("clock").textContent = time;
+      document.getElementById("date").textContent = date;
+    }
+
+    function enterFullscreen() {
+      const docEl = document.documentElement;
+      if (docEl.requestFullscreen) {
+        docEl.requestFullscreen();
+      } else if (docEl.webkitRequestFullscreen) {
+        docEl.webkitRequestFullscreen();
+      } else if (docEl.msRequestFullscreen) {
+        docEl.msRequestFullscreen();
+      }
+    }
+
+    window.onload = () => {
+      showRandomImage();
+      updateClock();
+      enterFullscreen();
+      setInterval(showRandomImage, 60000); // elke minuut
+      setInterval(updateClock, 1000);      // elke seconde
+    };
+  </script>
+</body>
+</html>
