@@ -6,7 +6,13 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+  <!-- Muziek -->
+  <audio id="bg-music" src="achtergrondmuziekje.mp3" autoplay loop></audio>
+
+  <!-- Afbeelding -->
   <img id="image" src="" alt="Wallpaper">
+
+  <!-- Overlay voor klok en datum -->
   <div id="overlay">
     <div id="clock"></div>
     <div id="date"></div>
@@ -14,11 +20,15 @@
 
   <script>
     const images = ["1.jpg", "2.jpg"];
-    const imagePath = ""; // root van de repository
+    const imagePath = "";
+    const imageElement = document.getElementById("image");
 
     function showRandomImage() {
+      imageElement.classList.remove("fade-in");
+      void imageElement.offsetWidth; // Force reflow
       const randomImage = images[Math.floor(Math.random() * images.length)];
-      document.getElementById("image").src = imagePath + randomImage;
+      imageElement.src = imagePath + randomImage;
+      imageElement.classList.add("fade-in");
     }
 
     function updateClock() {
