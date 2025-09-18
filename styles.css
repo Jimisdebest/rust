@@ -8,20 +8,6 @@ html, body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-/* Laadscherm */
-#loader {
-  position: fixed;
-  inset: 0;
-  background: black;
-  color: white;
-  font-size: 32px;
-  font-weight: bold;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 9999;
-}
-
 /* Achtergrondafbeelding */
 #image {
   position: absolute;
