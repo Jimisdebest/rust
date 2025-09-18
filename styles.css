@@ -1,5 +1,4 @@
-/* style.css */
-
+/* Algemene opmaak voor fullscreen en donkere achtergrond */
 html, body {
   margin: 0;
   padding: 0;
@@ -10,6 +9,7 @@ html, body {
   font-family: Arial, sans-serif;
 }
 
+/* De afbeelding vult het hele scherm en behoudt verhoudingen */
 #image {
   position: absolute;
   top: 0;
@@ -20,6 +20,7 @@ html, body {
   z-index: 0;
 }
 
+/* Overlay voor klok en datum rechtsonder */
 #overlay {
   position: absolute;
   bottom: 20px;
@@ -29,11 +30,13 @@ html, body {
   z-index: 1;
 }
 
+/* Klok: groter en vetgedrukt */
 #clock {
   font-size: 24px;
   font-weight: bold;
 }
 
+/* Datum: kleiner en subtieler */
 #date {
   font-size: 14px;
   opacity: 0.8;
