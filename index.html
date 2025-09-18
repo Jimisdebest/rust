@@ -2,7 +2,7 @@
 <html lang="nl">
 <head>
   <meta charset="UTF-8">
-  <title>Wallpaper Viewer</title>
+  <title>Wallpaper Viewer met Weer</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -12,20 +12,25 @@
   <!-- Achtergrondafbeelding -->
   <img id="image" src="" alt="Wallpaper">
 
-  <!-- Overlay rechtsboven -->
+  <!-- Overlay rechtsboven: weer boven, tijd groot, datum kleiner eronder -->
   <div id="overlay-top">
-    <div id="clock"></div>
-    <div id="date"></div>
-    <div id="weather"></div>
+    <div id="weather" class="weather">Weer laden…</div>
+    <div id="timeblock">
+      <div id="clock" class="clock"></div>
+      <div id="date" class="date"></div>
+    </div>
   </div>
 
   <script>
-    const maxImages = 20; // stel in tot hoeveel jpg-bestanden je hebt
-    const imagePath = "";
-    const imageElement = document.getElementById("image");
-
+    // Config
+    const maxImages = 20;              // Verhoog als je meer 3.jpg, 4.jpg, enz. toevoegt
+    const imagePath = "";              // Root
     const images = Array.from({ length: maxImages }, (_, i) => `${i + 1}.jpg`);
 
+    // Elementen
+    const imageElement = document.getElementById("image");
+
+    // Afbeelding tonen met fallback en fade
     function showRandomImage() {
       const randomImage = images[Math.floor(Math.random() * images.length)];
       const fullPath = imagePath + randomImage;
@@ -38,44 +43,52 @@
         imageElement.classList.add("fade-in");
       };
       testImage.onerror = () => {
-        showRandomImage(); // probeer opnieuw bij fout
+        // Probeer direct een andere
+        showRandomImage();
       };
       testImage.src = fullPath;
     }
 
+    // Klok en datum
     function updateClock() {
       const now = new Date();
       const time = now.toLocaleTimeString("nl-NL", {
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit'
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit"
       });
       const date = now.toLocaleDateString("nl-NL", {
-        weekday: 'long',
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric"
       });
       document.getElementById("clock").textContent = time;
       document.getElementById("date").textContent = date;
     }
 
+    // Weer (Open-Meteo, geen sleutel nodig)
     async function updateWeather() {
       try {
-        // Coördinaten Noordwijk-Binnen
-        const lat = 52.237; 
+        const lat = 52.237; // Noordwijk-Binnen
         const lon = 4.444;
         const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&timezone=Europe%2FAmsterdam`;
 
         const res = await fetch(url);
         const data = await res.json();
-        const temp = data.current_weather.temperature;
-        const wind = data.current_weather.windspeed;
-        const weatherCode = data.current_weather.weathercode;
 
+        if (!data?.current_weather) {
+          document.getElementById("weather").textContent = "Weer niet beschikbaar";
+          return;
+        }
+
+        const temp = Math.round(data.current_weather.temperature);
+        const wind = Math.round(data.current_weather.windspeed);
+        const weatherCode = data.current_weather.weathercode;
         const description = getWeatherDescription(weatherCode);
-        document.getElementById("weather").textContent = `${temp}°C, ${description}, wind ${wind} km/u`;
-      } catch (err) {
+
+        document.getElementById("weather").textContent = `${temp}°C • ${description} • wind ${wind} km/u`;
+      } catch {
         document.getElementById("weather").textContent = "Weer niet beschikbaar";
       }
     }
@@ -106,13 +119,9 @@
 
     function enterFullscreen() {
       const docEl = document.documentElement;
-      if (docEl.requestFullscreen) {
-        docEl.requestFullscreen();
-      } else if (docEl.webkitRequestFullscreen) {
-        docEl.webkitRequestFullscreen();
-      } else if (docEl.msRequestFullscreen) {
-        docEl.msRequestFullscreen();
-      }
+      if (docEl.requestFullscreen) docEl.requestFullscreen();
+      else if (docEl.webkitRequestFullscreen) docEl.webkitRequestFullscreen();
+      else if (docEl.msRequestFullscreen) docEl.msRequestFullscreen();
     }
 
     window.onload = () => {
@@ -120,9 +129,10 @@
       updateClock();
       updateWeather();
       enterFullscreen();
-      setInterval(showRandomImage, 60000); // elke minuut
-      setInterval(updateClock, 1000);      // elke seconde
-      setInterval(updateWeather, 600000);  // elke 10 min
+
+      setInterval(showRandomImage, 60000);  // elke minuut
+      setInterval(updateClock, 1000);       // elke seconde
+      setInterval(updateWeather, 600000);   // elke 10 min
     };
   </script>
 </body>
