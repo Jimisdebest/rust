@@ -3,45 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Bing Wallpaper Viewer</title>
-  <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      background-color: black;
-      overflow: hidden;
-      height: 100%;
-      width: 100%;
-    }
-
-    #image {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      object-fit: cover;
-      z-index: 0;
-    }
-
-    #overlay {
-      position: absolute;
-      bottom: 20px;
-      right: 30px;
-      color: white;
-      font-family: Arial, sans-serif;
-      text-align: right;
-      z-index: 1;
-    }
-
-    #clock {
-      font-size: 24px;
-    }
-
-    #date {
-      font-size: 14px;
-      opacity: 0.8;
-    }
-  </style>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <img id="image" src="" alt="Bing Wallpaper">
@@ -64,8 +26,17 @@
 
     function updateClock() {
       const now = new Date();
-      const time = now.toLocaleTimeString("nl-NL", { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-      const date = now.toLocaleDateString("nl-NL", { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+      const time = now.toLocaleTimeString("nl-NL", {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+      });
+      const date = now.toLocaleDateString("nl-NL", {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
       document.getElementById("clock").textContent = time;
       document.getElementById("date").textContent = date;
     }
