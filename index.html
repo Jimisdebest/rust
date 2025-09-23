@@ -5,20 +5,43 @@
   <title>Standby</title>
   <link rel="stylesheet" href="styles.css">
   <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+    }
+
+    #bingSearchContainer {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1000;
+    }
+
     #bingSearch {
       padding: 10px;
       width: 300px;
       font-size: 16px;
       border: 1px solid #ccc;
       border-radius: 6px;
-      margin-bottom: 20px;
+      background-color: rgba(255, 255, 255, 0.9);
+    }
+
+    #image {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      object-fit: cover;
+      z-index: -1;
     }
   </style>
 </head>
 <body>
 
-  <!-- Zoekbalk -->
-  <div style="margin: 20px;">
+  <!-- Zoekbalk midden boven -->
+  <div id="bingSearchContainer">
     <input
       type="text"
       id="bingSearch"
@@ -64,10 +87,7 @@
 
       const testImage = new Image();
       testImage.onload = () => {
-        imageElement.classList.remove("fade-in");
-        void imageElement.offsetWidth;
         imageElement.src = fullPath;
-        imageElement.classList.add("fade-in");
       };
       testImage.onerror = () => showRandomImage();
       testImage.src = fullPath;
