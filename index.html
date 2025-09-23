@@ -6,6 +6,26 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+<div style="margin: 20px;">
+  <input
+    type="text"
+    id="bingSearch"
+    placeholder="Zoek op Bing..."
+    style="padding: 10px; width: 300px; font-size: 16px;"
+    onkeydown="if (event.key === 'Enter') bingZoek()"
+  />
+</div>
+
+<script>
+  function bingZoek() {
+    const query = document.getElementById('bingSearch').value.trim();
+    if (query) {
+      const bingUrl = `https://www.bing.com/search?q=${encodeURIComponent(query)}`;
+      window.open(bingUrl, '_blank');
+    }
+  }
+</script>
+
   <!-- Achtergrondmuziek -->
   <audio id="bg-music" src="achtergrondmuziekje.mp3" autoplay loop></audio>
 
