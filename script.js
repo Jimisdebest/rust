@@ -20,7 +20,7 @@ async function updateWeather() {
 }
 
 function getRandomImageNumber() {
-  return Math.floor(Math.random() * 100) + 1;
+  return Math.floor(Math.random() * 10) + 1;
 }
 
 function updateBackground() {
