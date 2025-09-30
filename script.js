@@ -25,11 +25,11 @@ function getRandomImageNumber() {
 
 function updateBackground() {
   const imgNum = getRandomImageNumber();
-  const imgPath = `images/${imgNum}.jpg`;
+  const imgPath = `images/${imgNum}.png`;
 
   background.onerror = () => {
     const fallbackNum = getRandomImageNumber();
-    background.src = `images/${fallbackNum}.jpg`;
+    background.src = `images/${fallbackNum}.png`;
   };
 
   background.src = imgPath;
@@ -39,5 +39,5 @@ function updateBackground() {
 updateClock();
 updateWeather();
 updateBackground();
-setInterval(updateClock, 1000);
+setInterval(updateClock, 999);
 setInterval(updateBackground, 60000); // elke minuut
