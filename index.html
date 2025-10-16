@@ -4,90 +4,21 @@
   <meta charset="UTF-8" />
   <title>Startpagina</title>
   <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-    }
-
-    body {
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-      font-family: sans-serif;
-      position: relative;
-    }
-
-    /* Zoekbalk bovengecentreerd */
-    #search-container {
-      position: absolute;
-      top: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 10;
-    }
-
-    #search-input {
-      width: 400px;
-      padding: 10px 15px;
-      font-size: 16px;
-      border: none;
-      border-radius: 4px;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-    }
-
-    /* Info rechtsboven: temperatuur, tijd, datum + knop */
-    #info {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      text-align: right;
-      color: white;
-      text-shadow: 0 0 5px rgba(0, 0, 0, 0.7);
-      line-height: 1.2;
-      z-index: 10;
-    }
-
-    #temp {
-      font-size: 18px;
-      margin-bottom: 5px;
-    }
-
-    #time {
-      font-size: 22px;
-      margin-bottom: 5px;
-    }
-
-    #date {
-      font-size: 16px;
-      margin-bottom: 10px;
-    }
-
-    #settings-btn {
-      padding: 6px 12px;
-      font-size: 14px;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      background: rgba(255,255,255,0.8);
-      color: #333;
-    }
-
-    #settings-btn:hover {
-      background: rgba(255,255,255,1);
-    }
+    html, body { margin:0; padding:0; width:100%; height:100%; overflow:hidden; }
+    body { background-size:cover; background-position:center; background-repeat:no-repeat; font-family:sans-serif; position:relative; }
+    #search-container { position:absolute; top:20px; left:50%; transform:translateX(-50%); z-index:10; }
+    #search-input { width:400px; padding:10px 15px; font-size:16px; border:none; border-radius:4px; box-shadow:0 2px 6px rgba(0,0,0,0.3); }
+    #info { position:absolute; top:20px; right:20px; text-align:right; color:white; text-shadow:0 0 5px rgba(0,0,0,0.7); line-height:1.2; z-index:10; }
+    #temp { font-size:18px; margin-bottom:5px; }
+    #time { font-size:22px; margin-bottom:5px; }
+    #date { font-size:16px; margin-bottom:10px; }
+    #settings-btn { padding:6px 12px; font-size:14px; border:none; border-radius:4px; cursor:pointer; background:rgba(255,255,255,0.8); color:#333; }
+    #settings-btn:hover { background:rgba(255,255,255,1); }
   </style>
 </head>
 <body>
   <div id="search-container">
-    <input
-      type="text"
-      id="search-input"
-      placeholder="Zoeken…"
-      autocomplete="off"
-    />
+    <input type="text" id="search-input" placeholder="Zoeken…" autocomplete="off" />
   </div>
 
   <div id="info">
@@ -102,7 +33,9 @@
     const LOAD_TIMEOUT = 5000;
     const images = [];
 
-    // Afbeeldingen laden
+    // Base URL is gewoon je Pages root
+    const baseUrl = "https://jimisdebest.github.io/rust";
+
     function loadImageWithTimeout(url, timeout) {
       return new Promise((resolve, reject) => {
         const img = new Image();
@@ -110,16 +43,8 @@
           img.onload = img.onerror = null;
           reject(new Error('timeout'));
         }, timeout);
-
-        img.onload = () => {
-          clearTimeout(timer);
-          resolve(url);
-        };
-        img.onerror = () => {
-          clearTimeout(timer);
-          reject(new Error('error'));
-        };
-
+        img.onload = () => { clearTimeout(timer); resolve(url); };
+        img.onerror = () => { clearTimeout(timer); reject(new Error('error')); };
         img.src = url;
       });
     }
@@ -127,14 +52,9 @@
     async function preloadImages() {
       for (let i = 1; i <= MAX_IMAGES; i++) {
         try {
-          const found = await Promise.race([
-            loadImageWithTimeout(`${i}.jpg`, LOAD_TIMEOUT),
-            loadImageWithTimeout(`${i}.png`, LOAD_TIMEOUT),
-          ]);
+          const found = await loadImageWithTimeout(`${baseUrl}/${i}.png`, LOAD_TIMEOUT);
           images.push(found);
-        } catch (err) {
-          // overslaan
-        }
+        } catch (err) { /* overslaan */ }
       }
     }
 
@@ -161,35 +81,24 @@
       const mm = String(now.getMinutes()).padStart(2, '0');
       const ss = String(now.getSeconds()).padStart(2, '0');
       document.getElementById('time').textContent = `${hh}:${mm}:${ss}`;
-
-      const opts = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+      const opts = { weekday:'long', year:'numeric', month:'long', day:'numeric' };
       document.getElementById('date').textContent = now.toLocaleDateString('nl-NL', opts);
     }
 
-    // Weer ophalen met geocoding
     async function updateTemperature() {
       try {
         const savedLocation = localStorage.getItem('location') || 'Noordwijk-Binnen';
-        // Eerst geocoding
         const geoRes = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(savedLocation)}&count=1&language=nl&format=json`);
         const geoJson = await geoRes.json();
         if (!geoJson.results || !geoJson.results.length) return;
         const { latitude, longitude } = geoJson.results[0];
-
-        const res = await fetch(
-          `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true`
-        );
+        const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true`);
         const json = await res.json();
         const temp = json.current_weather?.temperature;
-        if (temp !== undefined) {
-          document.getElementById('temp').textContent = `${temp}°C`;
-        }
-      } catch (e) {
-        console.warn('Weer ophalen mislukt', e);
-      }
+        if (temp !== undefined) document.getElementById('temp').textContent = `${temp}°C`;
+      } catch (e) { console.warn('Weer ophalen mislukt', e); }
     }
 
-    // Zoekfunctie
     document.getElementById('search-input').addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
         const query = encodeURIComponent(e.target.value.trim());
@@ -204,18 +113,15 @@
       }
     });
 
-    // Instellingenknop
     document.getElementById('settings-btn').addEventListener('click', () => {
       window.location.href = 'instellingen.html';
     });
 
-    // Init
     (async () => {
       updateTime();
       updateTemperature();
       setInterval(updateTime, 1000);
       setInterval(updateTemperature, 600000);
-
       await preloadImages();
       rotateBackground();
       setInterval(rotateBackground, 60000);
