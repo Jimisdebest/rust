@@ -96,5 +96,31 @@
 
     <a href="index.html" class="back-btn">← Terug naar startpagina</a>
   </main>
+
+  <script>
+    const locationInput = document.getElementById('location');
+    const searchEngineSelect = document.getElementById('search-engine');
+    const backgroundSelect = document.getElementById('background');
+
+    // Laad bestaande instellingen
+    window.addEventListener('DOMContentLoaded', () => {
+      locationInput.value = localStorage.getItem('location') || '';
+      searchEngineSelect.value = localStorage.getItem('searchEngine') || 'bing';
+      backgroundSelect.value = localStorage.getItem('backgroundMode') || 'random';
+    });
+
+    // Opslaan bij wijziging
+    locationInput.addEventListener('input', () => {
+      localStorage.setItem('location', locationInput.value);
+    });
+
+    searchEngineSelect.addEventListener('change', () => {
+      localStorage.setItem('searchEngine', searchEngineSelect.value);
+    });
+
+    backgroundSelect.addEventListener('change', () => {
+      localStorage.setItem('backgroundMode', backgroundSelect.value);
+    });
+  </script>
 </body>
 </html>
