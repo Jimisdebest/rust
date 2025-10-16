@@ -76,11 +76,6 @@
 
   <main>
     <div class="setting">
-      <label for="location">Locatie voor weer:</label>
-      <input type="text" id="location" placeholder="Bijv. Noordwijk-Binnen">
-    </div>
-
-    <div class="setting">
       <label for="search-engine">Zoekmachine:</label>
       <select id="search-engine">
         <option value="bing">Bing</option>
@@ -98,60 +93,26 @@
     </div>
 
     <div class="setting">
-      <label for="clock-style">Klokstijl:</label>
-      <select id="clock-style">
-        <option value="digital">Digitaal</option>
-        <option value="analog">Analoog</option>
-      </select>
-    </div>
-
-    <div class="setting">
-      <label for="theme">Kleurthema:</label>
-      <select id="theme">
-        <option value="light">Licht</option>
-        <option value="dark">Donker</option>
-        <option value="auto">Automatisch</option>
-      </select>
-    </div>
-
-    <div class="setting">
-      <label for="weather-units">Temperatuureenheid:</label>
-      <select id="weather-units">
-        <option value="celsius">Celsius</option>
-        <option value="fahrenheit">Fahrenheit</option>
-      </select>
+      <label for="location">Locatie voor weer (optioneel):</label>
+      <input type="text" id="location" placeholder="Bijv. Noordwijk-Binnen">
     </div>
 
     <a href="index.html" class="back-btn">← Terug naar startpagina</a>
   </main>
 
   <script>
-    // Willekeurige achtergrond
     const baseUrl = "https://jimisdebest.github.io/rust";
     const randomIndex = Math.floor(Math.random() * 1000) + 1;
     document.body.style.backgroundImage = `url('${baseUrl}/${randomIndex}.png')`;
 
-    // Elementen ophalen
-    const locationInput = document.getElementById('location');
     const searchEngineSelect = document.getElementById('search-engine');
     const backgroundSelect = document.getElementById('background-mode');
-    const clockStyleSelect = document.getElementById('clock-style');
-    const themeSelect = document.getElementById('theme');
-    const unitsSelect = document.getElementById('weather-units');
+    const locationInput = document.getElementById('location');
 
-    // Instellingen laden
     window.addEventListener('DOMContentLoaded', () => {
-      locationInput.value = localStorage.getItem('location') || '';
       searchEngineSelect.value = localStorage.getItem('searchEngine') || 'bing';
       backgroundSelect.value = localStorage.getItem('backgroundMode') || 'random';
-      clockStyleSelect.value = localStorage.getItem('clockStyle') || 'digital';
-      themeSelect.value = localStorage.getItem('theme') || 'auto';
-      unitsSelect.value = localStorage.getItem('weatherUnits') || 'celsius';
-    });
-
-    // Opslaan bij wijziging
-    locationInput.addEventListener('input', () => {
-      localStorage.setItem('location', locationInput.value);
+      locationInput.value = localStorage.getItem('location') || '';
     });
 
     searchEngineSelect.addEventListener('change', () => {
@@ -162,16 +123,8 @@
       localStorage.setItem('backgroundMode', backgroundSelect.value);
     });
 
-    clockStyleSelect.addEventListener('change', () => {
-      localStorage.setItem('clockStyle', clockStyleSelect.value);
-    });
-
-    themeSelect.addEventListener('change', () => {
-      localStorage.setItem('theme', themeSelect.value);
-    });
-
-    unitsSelect.addEventListener('change', () => {
-      localStorage.setItem('weatherUnits', unitsSelect.value);
+    locationInput.addEventListener('input', () => {
+      localStorage.setItem('location', locationInput.value);
     });
   </script>
 </body>
