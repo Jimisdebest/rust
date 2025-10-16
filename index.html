@@ -20,7 +20,7 @@
       position: relative;
     }
 
-    /* Search bar bovengecentreerd */
+    /* Zoekbalk bovengecentreerd */
     #search-container {
       position: absolute;
       top: 20px;
@@ -38,7 +38,7 @@
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
     }
 
-    /* Info rechtsboven: temperatuur, tijd, datum */
+    /* Info rechtsboven: temperatuur, tijd, datum + knop */
     #info {
       position: absolute;
       top: 20px;
@@ -62,6 +62,21 @@
 
     #date {
       font-size: 16px;
+      margin-bottom: 10px;
+    }
+
+    #settings-btn {
+      padding: 6px 12px;
+      font-size: 14px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      background: rgba(255,255,255,0.8);
+      color: #333;
+    }
+
+    #settings-btn:hover {
+      background: rgba(255,255,255,1);
     }
   </style>
 </head>
@@ -70,7 +85,7 @@
     <input
       type="text"
       id="search-input"
-      placeholder="Zoeken op Bing…"
+      placeholder="Zoeken…"
       autocomplete="off"
     />
   </div>
@@ -79,6 +94,7 @@
     <div id="temp">–°C</div>
     <div id="time">–:–:–</div>
     <div id="date">–</div>
+    <button id="settings-btn">Instellingen</button>
   </div>
 
   <script>
@@ -86,7 +102,7 @@
     const LOAD_TIMEOUT = 5000;
     const images = [];
 
-    // Laadt een afbeelding met timeout
+    // Afbeeldingen laden
     function loadImageWithTimeout(url, timeout) {
       return new Promise((resolve, reject) => {
         const img = new Image();
@@ -108,7 +124,6 @@
       });
     }
 
-    // Preload 1.jpg / 1.png … 1000.jpg / 1000.png
     async function preloadImages() {
       for (let i = 1; i <= MAX_IMAGES; i++) {
         try {
@@ -118,24 +133,28 @@
           ]);
           images.push(found);
         } catch (err) {
-          // Niet gevonden binnen 5s of fout, overslaan
+          // overslaan
         }
       }
     }
 
-    // Achtergrond zetten
     function setBackground(url) {
       document.body.style.backgroundImage = `url('${url}')`;
     }
 
-    // Varieer elke minuut van afbeelding
     function rotateBackground() {
       if (!images.length) return;
-      const idx = Math.floor(Math.random() * images.length);
+      const mode = localStorage.getItem('backgroundMode') || 'random';
+      let idx;
+      if (mode === 'volgorde') {
+        rotateBackground.counter = (rotateBackground.counter || 0) + 1;
+        idx = rotateBackground.counter % images.length;
+      } else {
+        idx = Math.floor(Math.random() * images.length);
+      }
       setBackground(images[idx]);
     }
 
-    // Klok updaten
     function updateTime() {
       const now = new Date();
       const hh = String(now.getHours()).padStart(2, '0');
@@ -147,11 +166,18 @@
       document.getElementById('date').textContent = now.toLocaleDateString('nl-NL', opts);
     }
 
-    // Temperatuur ophalen (Open-Meteo, Noordwijk-Binnen coords)
+    // Weer ophalen met geocoding
     async function updateTemperature() {
       try {
+        const savedLocation = localStorage.getItem('location') || 'Noordwijk-Binnen';
+        // Eerst geocoding
+        const geoRes = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(savedLocation)}&count=1&language=nl&format=json`);
+        const geoJson = await geoRes.json();
+        if (!geoJson.results || !geoJson.results.length) return;
+        const { latitude, longitude } = geoJson.results[0];
+
         const res = await fetch(
-          'https://api.open-meteo.com/v1/forecast?latitude=52.2350&longitude=4.4576&current_weather=true'
+          `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true`
         );
         const json = await res.json();
         const temp = json.current_weather?.temperature;
@@ -163,17 +189,27 @@
       }
     }
 
-    // Search op Bing bij Enter
+    // Zoekfunctie
     document.getElementById('search-input').addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
         const query = encodeURIComponent(e.target.value.trim());
         if (query) {
-          window.location.href = `https://www.bing.com/search?q=${query}`;
+          const engine = localStorage.getItem('searchEngine') || 'bing';
+          let url;
+          if (engine === 'google') url = `https://www.google.com/search?q=${query}`;
+          else if (engine === 'duckduckgo') url = `https://duckduckgo.com/?q=${query}`;
+          else url = `https://www.bing.com/search?q=${query}`;
+          window.location.href = url;
         }
       }
     });
 
-    // Initialisatie
+    // Instellingenknop
+    document.getElementById('settings-btn').addEventListener('click', () => {
+      window.location.href = 'instellingen.html';
+    });
+
+    // Init
     (async () => {
       updateTime();
       updateTemperature();
