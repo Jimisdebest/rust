@@ -10,13 +10,7 @@
       width: 100%;
       height: 100%;
       overflow: hidden;
-    }
-
-    body {
-      background: #000 url('https://jimisdebest.github.io/rust/1.png') center center no-repeat;
-      background-size: cover;
       font-family: sans-serif;
-      position: relative;
       transition: background-color 0.3s;
     }
 
@@ -105,21 +99,9 @@
       background: white;
     }
 
-    .hour {
-      width: 4px;
-      height: 25%;
-    }
-
-    .minute {
-      width: 2px;
-      height: 35%;
-    }
-
-    .second {
-      width: 1px;
-      height: 45%;
-      background: red;
-    }
+    .hour { width: 4px; height: 25%; }
+    .minute { width: 2px; height: 35%; }
+    .second { width: 1px; height: 45%; background: red; }
   </style>
 </head>
 <body>
@@ -140,10 +122,10 @@
   </div>
 
   <script>
+    const baseUrl = "https://jimisdebest.github.io/rust";
     const MAX_IMAGES = 1000;
     const LOAD_TIMEOUT = 1000;
     const images = [];
-    const baseUrl = "https://jimisdebest.github.io/rust";
 
     const settings = {
       searchEngine: localStorage.getItem('searchEngine') || 'bing',
@@ -166,17 +148,9 @@
 
     applyTheme();
 
-    function loadImageWithTimeout(url, timeout) {
-      return new Promise((resolve, reject) => {
-        const img = new Image();
-        let timer = setTimeout(() => {
-          img.onload = img.onerror = null;
-          reject(new Error('timeout'));
-        }, timeout);
-        img.onload = () => { clearTimeout(timer); resolve(url); };
-        img.onerror = () => { clearTimeout(timer); reject(new Error('error')); };
-        img.src = url;
-      });
+    // Achtergrond instellen
+    function setBackground(url) {
+      document.body.style.background = `url('${url}') center center / cover no-repeat`;
     }
 
     async function preloadImages() {
@@ -184,17 +158,19 @@
       for (let i = 1; i <= MAX_IMAGES && misses < 10; i++) {
         try {
           const url = `${baseUrl}/${i}.png`;
-          const found = await loadImageWithTimeout(url, LOAD_TIMEOUT);
-          images.push(found);
+          await new Promise((resolve, reject) => {
+            const img = new Image();
+            const timer = setTimeout(() => reject(), LOAD_TIMEOUT);
+            img.onload = () => { clearTimeout(timer); resolve(); };
+            img.onerror = () => { clearTimeout(timer); reject(); };
+            img.src = url;
+          });
+          images.push(url);
           misses = 0;
         } catch {
           misses++;
         }
       }
-    }
-
-    function setBackground(url) {
-      document.body.style.backgroundImage = `url('${url}')`;
     }
 
     function rotateBackground() {
@@ -215,18 +191,16 @@
       const mm = String(now.getMinutes()).padStart(2, '0');
       const ss = String(now.getSeconds()).padStart(2, '0');
       document.getElementById('time').textContent = `${hh}:${mm}:${ss}`;
-      const opts = { weekday:'long', year:'numeric', month:'long', day:'numeric' };
-      document.getElementById('date').textContent = now.toLocaleDateString('nl-NL', opts);
+      document.getElementById('date').textContent = now.toLocaleDateString('nl-NL', {
+        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+      });
 
       if (settings.clockStyle === 'analog') {
         document.getElementById('analog-clock').style.display = 'block';
-        const hourDeg = ((now.getHours() % 12) + now.getMinutes() / 60) * 30;
-        const minuteDeg = now.getMinutes() * 6;
-        const secondDeg = now.getSeconds() * 6;
-        document.getElementById('hour-hand').style.transform = `rotate(${hourDeg}deg)`;
-        document.getElementById('minute-hand').style.transform = `rotate(${minuteDeg}deg)`;
-        document.getElementById('second-hand').style.transform = `rotate(${secondDeg}deg)`;
         document.getElementById('time').style.display = 'none';
+        document.getElementById('hour-hand').style.transform = `rotate(${(hh % 12) * 30 + mm / 2}deg)`;
+        document.getElementById('minute-hand').style.transform = `rotate(${mm * 6}deg)`;
+        document.getElementById('second-hand').style.transform = `rotate(${ss * 6}deg)`;
       } else {
         document.getElementById('analog-clock').style.display = 'none';
         document.getElementById('time').style.display = 'block';
@@ -237,11 +211,24 @@
       try {
         const geoRes = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(settings.location)}&count=1&language=nl&format=json`);
         const geoJson = await geoRes.json();
-        if (!geoJson.results || !geoJson.results.length) return;
+        if (!geoJson.results?.length) return;
         const { latitude, longitude } = geoJson.results[0];
         const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true`);
         const json = await res.json();
         let temp = json.current_weather?.temperature;
         if (temp !== undefined) {
           if (settings.weatherUnits === 'fahrenheit') {
-            temp =
+            temp = Math.round(temp * 9 / 5 + 32);
+            document.getElementById('temp').textContent = `${temp}°F`;
+          } else {
+            document.getElementById('temp').textContent = `${temp}°C`;
+          }
+        }
+      } catch (e) {
+        console.warn('Weer ophalen mislukt', e);
+      }
+    }
+
+    document.getElementById('search-input').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        const query = encode
