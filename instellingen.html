@@ -4,25 +4,32 @@
   <meta charset="UTF-8">
   <title>Instellingen</title>
   <style>
-    body {
-      font-family: sans-serif;
+    html, body {
       margin: 0;
       padding: 0;
-      background: #f0f0f0;
+      width: 100%;
+      height: 100%;
+      font-family: sans-serif;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
       color: #333;
     }
 
     header {
-      background: #333;
+      background: rgba(0,0,0,0.6);
       color: white;
       padding: 15px;
       text-align: center;
     }
 
     main {
+      background: rgba(255,255,255,0.85);
       padding: 20px;
       max-width: 800px;
-      margin: auto;
+      margin: 40px auto;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
     }
 
     h1 {
@@ -30,16 +37,12 @@
     }
 
     .setting {
-      background: white;
-      padding: 15px;
-      margin-bottom: 15px;
-      border-radius: 6px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
     }
 
     label {
       display: block;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
       font-weight: bold;
     }
 
@@ -74,7 +77,7 @@
   <main>
     <div class="setting">
       <label for="location">Locatie voor weer:</label>
-      <input type="text" id="location" placeholder="Bijv. Amsterdam">
+      <input type="text" id="location" placeholder="Bijv. Noordwijk-Binnen">
     </div>
 
     <div class="setting">
@@ -87,10 +90,35 @@
     </div>
 
     <div class="setting">
-      <label for="background">Achtergrondmodus:</label>
-      <select id="background">
+      <label for="background-mode">Achtergrondmodus:</label>
+      <select id="background-mode">
         <option value="random">Willekeurig</option>
         <option value="volgorde">Op volgorde</option>
+      </select>
+    </div>
+
+    <div class="setting">
+      <label for="clock-style">Klokstijl:</label>
+      <select id="clock-style">
+        <option value="digital">Digitaal</option>
+        <option value="analog">Analoog</option>
+      </select>
+    </div>
+
+    <div class="setting">
+      <label for="theme">Kleurthema:</label>
+      <select id="theme">
+        <option value="light">Licht</option>
+        <option value="dark">Donker</option>
+        <option value="auto">Automatisch</option>
+      </select>
+    </div>
+
+    <div class="setting">
+      <label for="weather-units">Temperatuureenheid:</label>
+      <select id="weather-units">
+        <option value="celsius">Celsius</option>
+        <option value="fahrenheit">Fahrenheit</option>
       </select>
     </div>
 
@@ -98,15 +126,27 @@
   </main>
 
   <script>
+    // Willekeurige achtergrond
+    const baseUrl = "https://jimisdebest.github.io/rust";
+    const randomIndex = Math.floor(Math.random() * 1000) + 1;
+    document.body.style.backgroundImage = `url('${baseUrl}/${randomIndex}.png')`;
+
+    // Elementen ophalen
     const locationInput = document.getElementById('location');
     const searchEngineSelect = document.getElementById('search-engine');
-    const backgroundSelect = document.getElementById('background');
+    const backgroundSelect = document.getElementById('background-mode');
+    const clockStyleSelect = document.getElementById('clock-style');
+    const themeSelect = document.getElementById('theme');
+    const unitsSelect = document.getElementById('weather-units');
 
-    // Laad bestaande instellingen
+    // Instellingen laden
     window.addEventListener('DOMContentLoaded', () => {
       locationInput.value = localStorage.getItem('location') || '';
       searchEngineSelect.value = localStorage.getItem('searchEngine') || 'bing';
       backgroundSelect.value = localStorage.getItem('backgroundMode') || 'random';
+      clockStyleSelect.value = localStorage.getItem('clockStyle') || 'digital';
+      themeSelect.value = localStorage.getItem('theme') || 'auto';
+      unitsSelect.value = localStorage.getItem('weatherUnits') || 'celsius';
     });
 
     // Opslaan bij wijziging
@@ -120,6 +160,18 @@
 
     backgroundSelect.addEventListener('change', () => {
       localStorage.setItem('backgroundMode', backgroundSelect.value);
+    });
+
+    clockStyleSelect.addEventListener('change', () => {
+      localStorage.setItem('clockStyle', clockStyleSelect.value);
+    });
+
+    themeSelect.addEventListener('change', () => {
+      localStorage.setItem('theme', themeSelect.value);
+    });
+
+    unitsSelect.addEventListener('change', () => {
+      localStorage.setItem('weatherUnits', unitsSelect.value);
     });
   </script>
 </body>
