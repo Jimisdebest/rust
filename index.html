@@ -11,17 +11,10 @@
       height: 100%;
       overflow: hidden;
       font-family: sans-serif;
-      transition: background-color 0.3s;
-    }
-
-    body.light {
-      background-color: #f0f0f0;
-      color: #222;
-    }
-
-    body.dark {
-      background-color: #111;
-      color: #eee;
+      background-color: #000;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
     }
 
     #search-container {
@@ -52,11 +45,6 @@
       z-index: 10;
     }
 
-    #temp {
-      font-size: 18px;
-      margin-bottom: 5px;
-    }
-
     #time {
       font-size: 22px;
       margin-bottom: 5px;
@@ -80,28 +68,6 @@
     #settings-btn:hover {
       background: rgba(255,255,255,1);
     }
-
-    #analog-clock {
-      width: 80px;
-      height: 80px;
-      border: 2px solid white;
-      border-radius: 50%;
-      position: relative;
-      margin-bottom: 10px;
-      display: none;
-    }
-
-    .hand {
-      position: absolute;
-      bottom: 50%;
-      left: 50%;
-      transform-origin: bottom center;
-      background: white;
-    }
-
-    .hour { width: 4px; height: 25%; }
-    .minute { width: 2px; height: 35%; }
-    .second { width: 1px; height: 45%; background: red; }
   </style>
 </head>
 <body>
@@ -110,12 +76,6 @@
   </div>
 
   <div id="info">
-    <div id="analog-clock">
-      <div class="hand hour" id="hour-hand"></div>
-      <div class="hand minute" id="minute-hand"></div>
-      <div class="hand second" id="second-hand"></div>
-    </div>
-    <div id="temp">–°C</div>
     <div id="time">–:–:–</div>
     <div id="date">–</div>
     <button id="settings-btn">Instellingen</button>
@@ -127,37 +87,18 @@
     const LOAD_TIMEOUT = 1000;
     const images = [];
 
-    const settings = {
-      searchEngine: localStorage.getItem('searchEngine') || 'bing',
-      backgroundMode: localStorage.getItem('backgroundMode') || 'random',
-      location: localStorage.getItem('location') || 'Noordwijk-Binnen',
-      clockStyle: localStorage.getItem('clockStyle') || 'digital',
-      theme: localStorage.getItem('theme') || 'auto',
-      weatherUnits: localStorage.getItem('weatherUnits') || 'celsius'
-    };
+    const searchEngine = localStorage.getItem('searchEngine') || 'bing';
+    const backgroundMode = localStorage.getItem('backgroundMode') || 'random';
 
-    // Thema toepassen
-    function applyTheme() {
-      if (settings.theme === 'light') document.body.classList.add('light');
-      else if (settings.theme === 'dark') document.body.classList.add('dark');
-      else {
-        const hour = new Date().getHours();
-        document.body.classList.add(hour >= 7 && hour <= 19 ? 'light' : 'dark');
-      }
-    }
-
-    applyTheme();
-
-    // Achtergrond instellen
     function setBackground(url) {
-      document.body.style.background = `url('${url}') center center / cover no-repeat`;
+      document.body.style.backgroundImage = `url('${url}')`;
     }
 
     async function preloadImages() {
       let misses = 0;
       for (let i = 1; i <= MAX_IMAGES && misses < 10; i++) {
+        const url = `${baseUrl}/${i}.png`;
         try {
-          const url = `${baseUrl}/${i}.png`;
           await new Promise((resolve, reject) => {
             const img = new Image();
             const timer = setTimeout(() => reject(), LOAD_TIMEOUT);
@@ -176,7 +117,7 @@
     function rotateBackground() {
       if (!images.length) return;
       let idx;
-      if (settings.backgroundMode === 'volgorde') {
+      if (backgroundMode === 'volgorde') {
         rotateBackground.counter = (rotateBackground.counter || 0) + 1;
         idx = rotateBackground.counter % images.length;
       } else {
@@ -194,41 +135,32 @@
       document.getElementById('date').textContent = now.toLocaleDateString('nl-NL', {
         weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
       });
-
-      if (settings.clockStyle === 'analog') {
-        document.getElementById('analog-clock').style.display = 'block';
-        document.getElementById('time').style.display = 'none';
-        document.getElementById('hour-hand').style.transform = `rotate(${(hh % 12) * 30 + mm / 2}deg)`;
-        document.getElementById('minute-hand').style.transform = `rotate(${mm * 6}deg)`;
-        document.getElementById('second-hand').style.transform = `rotate(${ss * 6}deg)`;
-      } else {
-        document.getElementById('analog-clock').style.display = 'none';
-        document.getElementById('time').style.display = 'block';
-      }
-    }
-
-    async function updateTemperature() {
-      try {
-        const geoRes = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(settings.location)}&count=1&language=nl&format=json`);
-        const geoJson = await geoRes.json();
-        if (!geoJson.results?.length) return;
-        const { latitude, longitude } = geoJson.results[0];
-        const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true`);
-        const json = await res.json();
-        let temp = json.current_weather?.temperature;
-        if (temp !== undefined) {
-          if (settings.weatherUnits === 'fahrenheit') {
-            temp = Math.round(temp * 9 / 5 + 32);
-            document.getElementById('temp').textContent = `${temp}°F`;
-          } else {
-            document.getElementById('temp').textContent = `${temp}°C`;
-          }
-        }
-      } catch (e) {
-        console.warn('Weer ophalen mislukt', e);
-      }
     }
 
     document.getElementById('search-input').addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
-        const query = encode
+        const query = encodeURIComponent(e.target.value.trim());
+        if (query) {
+          let url;
+          if (searchEngine === 'google') url = `https://www.google.com/search?q=${query}`;
+          else if (searchEngine === 'duckduckgo') url = `https://duckduckgo.com/?q=${query}`;
+          else url = `https://www.bing.com/search?q=${query}`;
+          window.location.href = url;
+        }
+      }
+    });
+
+    document.getElementById('settings-btn').addEventListener('click', () => {
+      window.location.href = 'instellingen.html';
+    });
+
+    (async () => {
+      updateTime();
+      setInterval(updateTime, 1000);
+      await preloadImages();
+      rotateBackground();
+      setInterval(rotateBackground, 60000);
+    })();
+  </script>
+</body>
+</html>
