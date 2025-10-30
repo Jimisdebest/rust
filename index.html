@@ -2,6 +2,7 @@
 <html lang="nl">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Startpagina</title>
   <style>
     html, body {
@@ -15,6 +16,43 @@
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
+      transition: background-image 1s ease-in-out;
+    }
+
+    #mascot-container {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 20;
+      animation: fadeOut 3s ease-in-out 2s forwards;
+    }
+
+    #mascot {
+      text-align: center;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    }
+
+    #mascot img {
+      width: 120px;
+      height: auto;
+      margin-bottom: 10px;
+    }
+
+    #mascot-text {
+      font-size: 20px;
+      color: #333;
+      font-weight: bold;
+    }
+
+    @keyframes fadeOut {
+      to {
+        opacity: 0;
+        visibility: hidden;
+      }
     }
 
     #search-container {
@@ -26,7 +64,8 @@
     }
 
     #search-input {
-      width: 400px;
+      width: 90vw;
+      max-width: 400px;
       padding: 10px 15px;
       font-size: 16px;
       border: none;
@@ -71,6 +110,13 @@
   </style>
 </head>
 <body>
+  <div id="mascot-container">
+    <div id="mascot">
+      <img src="https://jimisdebest.github.io/rust/mico.png" alt="Mascotte" />
+      <div id="mascot-text">Welkom!</div>
+    </div>
+  </div>
+
   <div id="search-container">
     <input type="text" id="search-input" placeholder="Zoeken…" autocomplete="off" />
   </div>
@@ -161,6 +207,11 @@
       rotateBackground();
       setInterval(rotateBackground, 60000);
     })();
+
+    setTimeout(() => {
+      const mascot = document.getElementById('mascot-container');
+      if (mascot) mascot.style.display = 'none';
+    }, 5000);
   </script>
 </body>
 </html>
