@@ -17,6 +17,23 @@
       background-position: center;
       background-repeat: no-repeat;
       transition: background-image 1s ease-in-out;
+      cursor: pointer;
+    }
+
+    .video-background {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: 1;
+      opacity: 0;
+      transition: opacity 1s ease-in-out;
+    }
+
+    .video-background.active {
+      opacity: 1;
     }
 
     #mascot-container {
@@ -26,6 +43,7 @@
       transform: translate(-50%, -50%);
       z-index: 20;
       animation: fadeOut 3s ease-in-out 2s forwards;
+      pointer-events: none;
     }
 
     #mascot {
@@ -34,6 +52,7 @@
       padding: 20px;
       border-radius: 12px;
       box-shadow: 0 0 20px rgba(0,0,0,0.5);
+      pointer-events: none;
     }
 
     #mascot img {
@@ -61,6 +80,7 @@
       left: 50%;
       transform: translateX(-50%);
       z-index: 10;
+      pointer-events: auto;
     }
 
     #search-input {
@@ -71,6 +91,7 @@
       border: none;
       border-radius: 4px;
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+      pointer-events: auto;
     }
 
     #info {
@@ -82,6 +103,7 @@
       text-shadow: 0 0 5px rgba(0, 0, 0, 0.7);
       line-height: 1.2;
       z-index: 10;
+      pointer-events: auto;
     }
 
     #time {
@@ -102,6 +124,7 @@
       cursor: pointer;
       background: rgba(255,255,255,0.8);
       color: #333;
+      pointer-events: auto;
     }
 
     #settings-btn:hover {
@@ -110,6 +133,21 @@
   </style>
 </head>
 <body>
+  <video id="video-stadsonrust" class="video-background" muted>
+    <source src="https://github.com/Jimisdebest/rust/blob/main/Stadsonrust.mp4?raw=true" type="video/mp4">
+    Je browser ondersteunt geen video-element.
+  </video>
+
+  <video id="video-tijger" class="video-background" muted>
+    <source src="https://github.com/Jimisdebest/rust/blob/main/Tijger.mp4?raw=true" type="video/mp4">
+    Je browser ondersteunt geen video-element.
+  </video>
+
+  <video id="video-mahmud" class="video-background" muted>
+    <source src="https://github.com/Jimisdebest/rust/blob/main/Mahmud.mp4?raw=true" type="video/mp4">
+    Je browser ondersteunt geen video-element.
+  </video>
+
   <div id="mascot-container">
     <div id="mascot">
       <img src="https://jimisdebest.github.io/rust/mico.png" alt="Mascotte" />
@@ -136,8 +174,72 @@
     const searchEngine = localStorage.getItem('searchEngine') || 'bing';
     const backgroundMode = localStorage.getItem('backgroundMode') || 'random';
 
+    // Lijst van video's
+    const videos = [
+      { id: 'video-stadsonrust', src: 'https://github.com/Jimisdebest/rust/blob/main/Stadsonrust.mp4?raw=true' },
+      { id: 'video-tijger', src: 'https://github.com/Jimisdebest/rust/blob/main/Tijger.mp4?raw=true' },
+      { id: 'video-mahmud', src: 'https://github.com/Jimisdebest/rust/blob/main/Mahmud.mp4?raw=true' }
+    ];
+
+    let currentBackgroundType = 'video'; // Start met video
+    let currentImageIndex = 0;
+    let currentVideoIndex = 0;
+
     function setBackground(url) {
       document.body.style.backgroundImage = `url('${url}')`;
+    }
+
+    function showVideo(videoIndex) {
+      // Verberg alle video's eerst
+      hideAllVideos();
+      
+      const video = document.getElementById(videos[videoIndex].id);
+      video.classList.add('active');
+      document.body.style.backgroundImage = 'none';
+      
+      // Start de video vanaf het begin
+      video.currentTime = 0;
+      video.play().catch(e => {
+        console.log("Video autoplay geblokkeerd:", e);
+      });
+      
+      currentVideoIndex = videoIndex;
+    }
+
+    function hideAllVideos() {
+      videos.forEach(video => {
+        const videoElement = document.getElementById(video.id);
+        videoElement.classList.remove('active');
+        videoElement.pause();
+      });
+    }
+
+    function getNextVideoIndex() {
+      return (currentVideoIndex + 1) % videos.length;
+    }
+
+    function showNextBackground() {
+      if (currentBackgroundType === 'video') {
+        // Wissel naar afbeelding
+        currentBackgroundType = 'image';
+        hideAllVideos();
+        
+        if (images.length > 0) {
+          let idx;
+          if (backgroundMode === 'volgorde') {
+            currentImageIndex = (currentImageIndex + 1) % images.length;
+            idx = currentImageIndex;
+          } else {
+            idx = Math.floor(Math.random() * images.length);
+          }
+          setBackground(images[idx]);
+        }
+      } else {
+        // Wissel naar volgende video
+        currentBackgroundType = 'video';
+        const nextVideoIndex = getNextVideoIndex();
+        showVideo(nextVideoIndex);
+      }
     }
 
     async function preloadImages() {
@@ -160,18 +262,6 @@
       }
     }
 
-    function rotateBackground() {
-      if (!images.length) return;
-      let idx;
-      if (backgroundMode === 'volgorde') {
-        rotateBackground.counter = (rotateBackground.counter || 0) + 1;
-        idx = rotateBackground.counter % images.length;
-      } else {
-        idx = Math.floor(Math.random() * images.length);
-      }
-      setBackground(images[idx]);
-    }
-
     function updateTime() {
       const now = new Date();
       const hh = String(now.getHours()).padStart(2, '0');
@@ -182,6 +272,25 @@
         weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
       });
     }
+
+    // Event listeners voor video-einde
+    function setupVideoEndListeners() {
+      videos.forEach(video => {
+        const videoElement = document.getElementById(video.id);
+        videoElement.addEventListener('ended', () => {
+          console.log(`Video ${video.id} is afgelopen, volgende achtergrond...`);
+          showNextBackground();
+        });
+      });
+    }
+
+    // Klik event voor de achtergrond
+    document.body.addEventListener('click', (e) => {
+      // Alleen reageren op klikken op de achtergrond zelf, niet op andere elementen
+      if (e.target === document.body || e.target.classList.contains('video-background')) {
+        showNextBackground();
+      }
+    });
 
     document.getElementById('search-input').addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
@@ -203,9 +312,15 @@
     (async () => {
       updateTime();
       setInterval(updateTime, 1000);
+      
+      // Stel video end listeners in
+      setupVideoEndListeners();
+      
+      // Start met de eerste video
+      showVideo(0);
+      
+      // Laad afbeeldingen voor later gebruik
       await preloadImages();
-      rotateBackground();
-      setInterval(rotateBackground, 60000);
     })();
 
     setTimeout(() => {
