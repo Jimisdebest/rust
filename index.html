@@ -1,0 +1,1066 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zoekmachine</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4285f4;
+            --background-color: #ffffff;
+            --text-color: #333333;
+            --input-background: #f1f3f4;
+            --card-background: #ffffff;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+            --border-color: #e0e0e0;
+        }
+
+        .dark-mode {
+            --primary-color: #8ab4f8;
+            --background-color: #202124;
+            --text-color: #e8eaed;
+            --input-background: #303134;
+            --card-background: #303134;
+            --shadow-color: rgba(0, 0, 0, 0.3);
+            --border-color: #5f6368;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            padding: 20px;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            transition: background-image 1s ease-in-out;
+        }
+
+        .search-container {
+            position: absolute;
+            top: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 600px;
+            text-align: center;
+        }
+
+        #search-input {
+            width: 100%;
+            padding: 15px 20px;
+            font-size: 1.1rem;
+            border: none;
+            border-radius: 50px;
+            background-color: var(--input-background);
+            color: var(--text-color);
+            outline: none;
+            box-shadow: 0 2px 10px var(--shadow-color);
+        }
+
+        #search-input:focus {
+            box-shadow: 0 2px 15px var(--shadow-color);
+        }
+
+        .shortcuts-container {
+            margin-top: 150px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            padding: 20px;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+            min-height: 100px;
+        }
+
+        .shortcut-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 10px;
+            transition: background-color 0.2s, transform 0.2s;
+            position: relative;
+            min-width: 80px;
+            user-select: none;
+        }
+
+        .shortcut-item:hover {
+            background-color: var(--input-background);
+            transform: translateY(-2px);
+        }
+
+        .shortcut-item.dragging {
+            opacity: 0.5;
+            transform: scale(0.95);
+            z-index: 1000;
+        }
+
+        .shortcut-item.drop-zone {
+            background-color: rgba(66, 133, 244, 0.2);
+            border: 2px dashed var(--primary-color);
+        }
+
+        .shortcut-item.hover-delete {
+            background-color: rgba(244, 67, 54, 0.2);
+            border: 2px dashed #f44336;
+        }
+
+        .shortcut-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            background-color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 8px;
+            font-size: 1.5rem;
+            color: white;
+            overflow: hidden;
+        }
+
+        .shortcut-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .shortcut-name {
+            font-size: 0.8rem;
+            text-align: center;
+            word-break: break-word;
+            max-width: 80px;
+        }
+
+        .delete-hint {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: #f44336;
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.6rem;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .shortcut-item:hover .delete-hint {
+            opacity: 1;
+        }
+
+        .drag-handle {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            color: var(--text-color);
+            opacity: 0.3;
+            font-size: 0.7rem;
+            cursor: grab;
+        }
+
+        .shortcut-item:hover .drag-handle {
+            opacity: 0.7;
+        }
+
+        .settings-icon {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            background-color: var(--card-background);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 10px var(--shadow-color);
+            z-index: 100;
+        }
+
+        .settings-menu {
+            position: fixed;
+            top: 70px;
+            right: 20px;
+            background-color: var(--card-background);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px var(--shadow-color);
+            width: 300px;
+            display: none;
+            z-index: 100;
+        }
+
+        .settings-menu h3 {
+            margin-bottom: 15px;
+            color: var(--primary-color);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        .setting-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        .setting-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        select, input[type="text"] {
+            width: 100%;
+            padding: 8px 12px;
+            border-radius: 8px;
+            background-color: var(--input-background);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            outline: none;
+        }
+
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--primary-color);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        .btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            width: 100%;
+            margin-top: 5px;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+
+        .view-toggle {
+            display: flex;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .view-toggle button {
+            flex: 1;
+            padding: 8px;
+            background-color: var(--input-background);
+            border: none;
+            cursor: pointer;
+            color: var(--text-color);
+        }
+
+        .view-toggle button.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .manage-shortcuts {
+            margin-top: 20px;
+        }
+
+        .shortcut-list {
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px;
+        }
+
+        .shortcut-list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .shortcut-list-item:last-child {
+            border-bottom: none;
+        }
+
+        .delete-shortcut {
+            color: #f44336;
+            cursor: pointer;
+            background: none;
+            border: none;
+            font-size: 1rem;
+        }
+
+        .recent-sites {
+            display: none;
+        }
+
+        .background-info {
+            margin-top: 20px;
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--card-background);
+            color: var(--text-color);
+            padding: 10px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px var(--shadow-color);
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .notification.show {
+            opacity: 1;
+        }
+
+        @media (max-width: 600px) {
+            .search-container {
+                top: 8%;
+            }
+            
+            .shortcuts-container {
+                margin-top: 120px;
+                gap: 15px;
+            }
+            
+            .settings-menu {
+                width: 90%;
+                right: 5%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="search-container">
+        <input type="text" id="search-input" placeholder="Zoeken op Google...">
+    </div>
+    
+    <div class="shortcuts-container" id="shortcuts-container">
+        <!-- Snelkoppelingen worden hier dynamisch ingeladen -->
+    </div>
+    
+    <div class="settings-icon" id="settings-toggle">
+        <i class="fas fa-cog"></i>
+    </div>
+    
+    <div class="settings-menu" id="settings-menu">
+        <h3>Instellingen</h3>
+        
+        <div class="setting-group">
+            <label for="search-engine">Zoekmachine:</label>
+            <select id="search-engine">
+                <option value="google">Google</option>
+                <option value="bing">Bing</option>
+                <option value="yahoo">Yahoo</option>
+                <option value="duckduckgo">DuckDuckGo</option>
+            </select>
+        </div>
+        
+        <div class="setting-group">
+            <label for="theme-toggle">Donkere modus:</label>
+            <div class="toggle-container">
+                <span>Uit</span>
+                <label class="switch">
+                    <input type="checkbox" id="theme-toggle">
+                    <span class="slider"></span>
+                </label>
+                <span>Aan</span>
+            </div>
+        </div>
+        
+        <div class="view-toggle">
+            <button id="show-shortcuts" class="active">Snelkoppelingen</button>
+            <button id="show-recent">Recente websites</button>
+        </div>
+        
+        <div class="setting-group">
+            <label for="new-shortcut">Snelkoppeling toevoegen:</label>
+            <input type="text" id="new-shortcut" placeholder="Voer website URL in">
+            <button class="btn" id="add-shortcut">Toevoegen</button>
+        </div>
+        
+        <div class="manage-shortcuts">
+            <h4>Snelkoppelingen beheren</h4>
+            <div class="shortcut-list" id="shortcut-list">
+                <!-- Snelkoppelingen beheer lijst -->
+            </div>
+        </div>
+    </div>
+
+    <div class="notification" id="notification">
+        <!-- Notificatie berichten -->
+    </div>
+
+    <script>
+        // Snelkoppelingen
+        const defaultShortcuts = {
+            'ai': {name: 'AI', url: 'https://jimisdebest.github.io/ai/', icon: '🤖'},
+            'copilot': {name: 'Copilot', url: 'https://copilot.microsoft.com/', icon: '🖥️'},
+            'dj': {name: 'DJ', url: 'https://tycho2014.github.io/dj-T-J/', icon: '🎧'},
+            'bba': {name: 'BBA', url: 'https://jimisdebest.github.io/bba_2025-2026/index.html', icon: '📊'},
+            'welkom': {name: 'Welkom', url: 'https://jimisdebest.github.io/welkom/', icon: '🏠'},
+            'rekenmachine': {name: 'Rekenmachine', url: 'https://jimisdebest.github.io/welkom/rekenmachine.html', icon: '🧮'},
+            'songs': {name: 'Songs', url: 'https://jimisdebest.github.io/songs/', icon: '🎵'},
+            'smartbot': {name: 'SmartBot', url: 'https://tycho2014.github.io/SmartBot/', icon: '🤖'}
+        };
+
+        // Speciale snelkoppelingen die werken maar niet getoond worden
+        const hiddenShortcuts = {
+            'coppie': {name: 'Copilot', url: 'https://copilot.microsoft.com/', icon: '🖥️'}
+        };
+
+        // Achtergrondafbeeldingen
+        const backgrounds = [
+            'linear-gradient(120deg, #a1c4fd 0%, #c2e9fb 100%)',
+            'linear-gradient(120deg, #d4fc79 0%, #96e6a1 100%)',
+            'linear-gradient(120deg, #84fab0 0%, #8fd3f4 100%)',
+            'linear-gradient(120deg, #ff9a9e 0%, #fecfef 100%)',
+            'linear-gradient(120deg, #a6c0fe 0%, #f68084 100%)',
+            'linear-gradient(120deg, #fccb90 0%, #d57eeb 100%)',
+            'linear-gradient(120deg, #e0c3fc 0%, #8ec5fc 100%)',
+            'linear-gradient(120deg, #f093fb 0%, #f5576c 100%)',
+            'linear-gradient(120deg, #4facfe 0%, #00f2fe 100%)',
+            'linear-gradient(120deg, #43e97b 0%, #38f9d7 100%)'
+        ];
+
+        // DOM-elementen
+        const searchInput = document.getElementById('search-input');
+        const settingsToggle = document.getElementById('settings-toggle');
+        const settingsMenu = document.getElementById('settings-menu');
+        const searchEngineSelect = document.getElementById('search-engine');
+        const themeToggle = document.getElementById('theme-toggle');
+        const shortcutsContainer = document.getElementById('shortcuts-container');
+        const shortcutList = document.getElementById('shortcut-list');
+        const newShortcutInput = document.getElementById('new-shortcut');
+        const addShortcutBtn = document.getElementById('add-shortcut');
+        const showShortcutsBtn = document.getElementById('show-shortcuts');
+        const showRecentBtn = document.getElementById('show-recent');
+        const notification = document.getElementById('notification');
+        const body = document.body;
+
+        // Zoekmachine URL's
+        const searchEngines = {
+            google: {name: 'Google', url: 'https://www.google.com/search?q='},
+            bing: {name: 'Bing', url: 'https://www.bing.com/search?q='},
+            yahoo: {name: 'Yahoo', url: 'https://search.yahoo.com/search?p='},
+            duckduckgo: {name: 'DuckDuckGo', url: 'https://duckduckgo.com/?q='}
+        };
+
+        // Huidige hover status
+        let currentHoveredShortcut = null;
+        let isDragging = false;
+        let dragSrcEl = null;
+        let currentView = 'shortcuts'; // 'shortcuts' of 'recent'
+
+        // Verwijderde snelkoppelingen (permanent verwijderd)
+        let deletedShortcuts = JSON.parse(localStorage.getItem('deletedShortcuts')) || {};
+
+        // Laad opgeslagen instellingen
+        function loadSettings() {
+            const savedSearchEngine = localStorage.getItem('searchEngine') || 'google';
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            const savedShortcutsOrder = JSON.parse(localStorage.getItem('shortcutsOrder')) || Object.keys(defaultShortcuts);
+            const savedRecentSites = JSON.parse(localStorage.getItem('recentSites')) || [];
+            const savedCurrentView = localStorage.getItem('currentView') || 'shortcuts';
+            deletedShortcuts = JSON.parse(localStorage.getItem('deletedShortcuts')) || {};
+            
+            searchEngineSelect.value = savedSearchEngine;
+            updateSearchPlaceholder();
+            
+            if (savedTheme === 'dark') {
+                themeToggle.checked = true;
+                body.classList.add('dark-mode');
+            }
+            
+            // Laad huidige view
+            currentView = savedCurrentView;
+            if (currentView === 'recent') {
+                showRecentBtn.classList.add('active');
+                showShortcutsBtn.classList.remove('active');
+                showRecentSites();
+            } else {
+                showShortcutsBtn.classList.add('active');
+                showRecentBtn.classList.remove('active');
+                loadShortcutsInOrder(savedShortcutsOrder);
+            }
+            
+            // Laad recente websites
+            recentSites = savedRecentSites;
+        }
+
+        // Update placeholder tekst
+        function updateSearchPlaceholder() {
+            const engine = searchEngineSelect.value;
+            searchInput.placeholder = `Zoeken op ${searchEngines[engine].name}...`;
+        }
+
+        // Sla instellingen op
+        function saveSettings() {
+            localStorage.setItem('searchEngine', searchEngineSelect.value);
+            localStorage.setItem('theme', themeToggle.checked ? 'dark' : 'light');
+            localStorage.setItem('currentView', currentView);
+        }
+
+        // Sla snelkoppelingen volgorde op
+        function saveShortcutsOrder() {
+            const shortcuts = Array.from(shortcutsContainer.querySelectorAll('.shortcut-item'));
+            const order = shortcuts.map(item => item.getAttribute('data-key'));
+            localStorage.setItem('shortcutsOrder', JSON.stringify(order));
+        }
+
+        // Sla recente websites op
+        function saveRecentSites() {
+            localStorage.setItem('recentSites', JSON.stringify(recentSites));
+        }
+
+        // Sla verwijderde snelkoppelingen op
+        function saveDeletedShortcuts() {
+            localStorage.setItem('deletedShortcuts', JSON.stringify(deletedShortcuts));
+        }
+
+        // Toon notificatie
+        function showNotification(message, duration = 3000) {
+            notification.textContent = message;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, duration);
+        }
+
+        // Laad en toon snelkoppelingen in volgorde
+        function loadShortcutsInOrder(order) {
+            const allShortcuts = {...defaultShortcuts, ...JSON.parse(localStorage.getItem('customShortcuts') || '{}')};
+            const shortcutsToShow = {};
+            
+            // Filter verwijderde snelkoppelingen eruit
+            const filteredOrder = order.filter(key => !deletedShortcuts[key]);
+            
+            // Behoud de volgorde
+            filteredOrder.forEach(key => {
+                if (allShortcuts[key] && !deletedShortcuts[key]) {
+                    shortcutsToShow[key] = allShortcuts[key];
+                }
+            });
+            
+            // Voeg eventuele nieuwe toe aan het einde
+            for (const key in allShortcuts) {
+                if (!shortcutsToShow[key] && !deletedShortcuts[key]) {
+                    shortcutsToShow[key] = allShortcuts[key];
+                }
+            }
+            
+            loadShortcuts(shortcutsToShow);
+        }
+
+        // Laad en toon snelkoppelingen
+        function loadShortcuts(shortcuts) {
+            shortcutsContainer.innerHTML = '';
+            
+            for (const key in shortcuts) {
+                // Controleer of de snelkoppeling niet verwijderd is
+                if (!deletedShortcuts[key]) {
+                    const shortcut = shortcuts[key];
+                    const shortcutElement = createShortcutElement(key, shortcut);
+                    shortcutsContainer.appendChild(shortcutElement);
+                }
+            }
+            
+            // Toon beheerlijst
+            updateShortcutList(shortcuts);
+        }
+
+        // Maak een snelkoppeling element
+        function createShortcutElement(key, shortcut) {
+            const shortcutElement = document.createElement('div');
+            shortcutElement.className = 'shortcut-item';
+            shortcutElement.setAttribute('data-key', key);
+            shortcutElement.setAttribute('data-url', shortcut.url);
+            shortcutElement.setAttribute('draggable', 'true');
+            
+            shortcutElement.innerHTML = `
+                <div class="drag-handle">⋮⋮</div>
+                <div class="shortcut-icon">
+                    ${shortcut.icon || '🔗'}
+                </div>
+                <div class="shortcut-name">${shortcut.name}</div>
+                <div class="delete-hint">⌫</div>
+            `;
+            
+            // Event listeners voor hover en klik
+            shortcutElement.addEventListener('mouseenter', function() {
+                currentHoveredShortcut = this;
+            });
+            
+            shortcutElement.addEventListener('mouseleave', function() {
+                if (currentHoveredShortcut === this) {
+                    currentHoveredShortcut = null;
+                }
+                this.classList.remove('hover-delete');
+            });
+            
+            shortcutElement.addEventListener('click', function(e) {
+                if (!isDragging && !this.classList.contains('hover-delete')) {
+                    window.location.href = this.getAttribute('data-url');
+                    addToRecentSites(shortcut.name, shortcut.url);
+                }
+            });
+            
+            // Drag and drop events
+            shortcutElement.addEventListener('dragstart', handleDragStart);
+            shortcutElement.addEventListener('dragover', handleDragOver);
+            shortcutElement.addEventListener('dragenter', handleDragEnter);
+            shortcutElement.addEventListener('dragleave', handleDragLeave);
+            shortcutElement.addEventListener('dragend', handleDragEnd);
+            shortcutElement.addEventListener('drop', handleDrop);
+            
+            return shortcutElement;
+        }
+
+        // Drag and drop functies
+        function handleDragStart(e) {
+            if (currentView !== 'shortcuts') return;
+            
+            isDragging = true;
+            dragSrcEl = this;
+            this.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/plain', this.getAttribute('data-key'));
+            
+            // Voeg drop-zone class toe aan alle items behalve het gesleepte item
+            const allItems = document.querySelectorAll('.shortcut-item');
+            allItems.forEach(item => {
+                if (item !== this) {
+                    item.classList.add('drop-zone');
+                }
+            });
+        }
+
+        function handleDragOver(e) {
+            if (currentView !== 'shortcuts') return;
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            return false;
+        }
+
+        function handleDragEnter(e) {
+            if (currentView !== 'shortcuts') return;
+            this.classList.add('drop-zone');
+        }
+
+        function handleDragLeave(e) {
+            if (currentView !== 'shortcuts') return;
+            this.classList.remove('drop-zone');
+        }
+
+        function handleDragEnd(e) {
+            if (currentView !== 'shortcuts') return;
+            
+            isDragging = false;
+            const allItems = document.querySelectorAll('.shortcut-item');
+            allItems.forEach(item => {
+                item.classList.remove('dragging', 'drop-zone');
+            });
+        }
+
+        function handleDrop(e) {
+            if (currentView !== 'shortcuts') return;
+            e.preventDefault();
+            
+            if (dragSrcEl !== this) {
+                // Verwijder drop-zone class van alle items
+                const allItems = document.querySelectorAll('.shortcut-item');
+                allItems.forEach(item => {
+                    item.classList.remove('drop-zone');
+                });
+                
+                // Vind de dichtstbijzijnde geldige positie
+                const containerRect = shortcutsContainer.getBoundingClientRect();
+                const itemRect = this.getBoundingClientRect();
+                const dragRect = dragSrcEl.getBoundingClientRect();
+                
+                // Bepaal of we voor of na het huidige element moeten invoegen
+                const dragCenterX = dragRect.left + dragRect.width / 2;
+                const thisCenterX = itemRect.left + itemRect.width / 2;
+                
+                if (dragCenterX < thisCenterX) {
+                    shortcutsContainer.insertBefore(dragSrcEl, this);
+                } else {
+                    shortcutsContainer.insertBefore(dragSrcEl, this.nextSibling);
+                }
+                
+                saveShortcutsOrder();
+            }
+            
+            return false;
+        }
+
+        // Update beheerlijst van snelkoppelingen
+        function updateShortcutList(shortcuts) {
+            shortcutList.innerHTML = '';
+            
+            for (const key in shortcuts) {
+                // Toon alleen niet-verwijderde snelkoppelingen
+                if (!deletedShortcuts[key]) {
+                    const shortcut = shortcuts[key];
+                    const listItem = document.createElement('div');
+                    listItem.className = 'shortcut-list-item';
+                    
+                    listItem.innerHTML = `
+                        <span>${shortcut.name}</span>
+                        <button class="delete-shortcut" data-key="${key}">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    `;
+                    
+                    shortcutList.appendChild(listItem);
+                }
+            }
+            
+            // Voeg event listeners toe voor verwijderknop
+            document.querySelectorAll('.delete-shortcut').forEach(button => {
+                button.addEventListener('click', function() {
+                    const key = this.getAttribute('data-key');
+                    deleteShortcut(key);
+                });
+            });
+        }
+
+        // Verwijder een snelkoppeling
+        function deleteShortcut(key) {
+            const shortcutName = (defaultShortcuts[key] || JSON.parse(localStorage.getItem('customShortcuts') || '{}')[key])?.name;
+            
+            // Markeer als permanent verwijderd
+            deletedShortcuts[key] = true;
+            saveDeletedShortcuts();
+            
+            if (defaultShortcuts[key]) {
+                // Verwijder standaard snelkoppeling uit de volgorde
+                const savedOrder = JSON.parse(localStorage.getItem('shortcutsOrder')) || Object.keys(defaultShortcuts);
+                const newOrder = savedOrder.filter(k => k !== key);
+                localStorage.setItem('shortcutsOrder', JSON.stringify(newOrder));
+                
+                // Herlaad snelkoppelingen
+                loadShortcutsInOrder(newOrder);
+                showNotification(`Snelkoppeling ${shortcutName} verwijderd`, 2000);
+            } else {
+                // Verwijder aangepaste snelkoppeling
+                const savedShortcuts = JSON.parse(localStorage.getItem('customShortcuts')) || {};
+                delete savedShortcuts[key];
+                localStorage.setItem('customShortcuts', JSON.stringify(savedShortcuts));
+                
+                // Update volgorde
+                const savedOrder = JSON.parse(localStorage.getItem('shortcutsOrder')) || Object.keys(defaultShortcuts);
+                const newOrder = savedOrder.filter(k => k !== key);
+                localStorage.setItem('shortcutsOrder', JSON.stringify(newOrder));
+                
+                loadShortcuts({...defaultShortcuts, ...savedShortcuts});
+                showNotification(`Snelkoppeling ${shortcutName} verwijderd`, 2000);
+            }
+        }
+
+        // Voeg een nieuwe snelkoppeling toe
+        function addNewShortcut() {
+            const url = newShortcutInput.value.trim();
+            if (!url) return;
+            
+            // Valideer URL
+            let validUrl = url;
+            if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                validUrl = 'https://' + url;
+            }
+            
+            try {
+                const urlObj = new URL(validUrl);
+                const hostname = urlObj.hostname.replace('www.', '');
+                const name = hostname.split('.')[0];
+                const key = name.toLowerCase();
+                
+                // Controleer of de snelkoppeling al bestaat
+                const allShortcuts = {...defaultShortcuts, ...JSON.parse(localStorage.getItem('customShortcuts') || '{}')};
+                if (allShortcuts[key] && !deletedShortcuts[key]) {
+                    showNotification('Deze snelkoppeling bestaat al', 3000);
+                    return;
+                }
+                
+                const savedShortcuts = JSON.parse(localStorage.getItem('customShortcuts')) || {};
+                savedShortcuts[key] = {
+                    name: name.charAt(0).toUpperCase() + name.slice(1),
+                    url: validUrl,
+                    icon: '🔗'
+                };
+                
+                localStorage.setItem('customShortcuts', JSON.stringify(savedShortcuts));
+                
+                // Verwijder uit deletedShortcuts als het daar in zat
+                if (deletedShortcuts[key]) {
+                    delete deletedShortcuts[key];
+                    saveDeletedShortcuts();
+                }
+                
+                // Voeg toe aan volgorde
+                const savedOrder = JSON.parse(localStorage.getItem('shortcutsOrder')) || Object.keys(defaultShortcuts);
+                if (!savedOrder.includes(key)) {
+                    savedOrder.push(key);
+                    localStorage.setItem('shortcutsOrder', JSON.stringify(savedOrder));
+                }
+                
+                loadShortcuts({...defaultShortcuts, ...savedShortcuts});
+                newShortcutInput.value = '';
+                showNotification('Snelkoppeling toegevoegd', 2000);
+            } catch (e) {
+                showNotification('Ongeldige URL. Voer een geldige website URL in.', 3000);
+            }
+        }
+
+        // Recente websites
+        let recentSites = [];
+        
+        // Voeg website toe aan recente lijst
+        function addToRecentSites(name, url) {
+            // Controleer of website al in lijst staat
+            const existingIndex = recentSites.findIndex(site => site.url === url);
+            
+            if (existingIndex !== -1) {
+                // Verplaats naar boven
+                const existing = recentSites.splice(existingIndex, 1)[0];
+                recentSites.unshift(existing);
+            } else {
+                // Voeg nieuwe toe
+                recentSites.unshift({
+                    name: name,
+                    url: url,
+                    icon: '🔗',
+                    timestamp: new Date().getTime()
+                });
+                
+                // Beperk tot 12 items
+                if (recentSites.length > 12) {
+                    recentSites.pop();
+                }
+            }
+            
+            saveRecentSites();
+        }
+
+        // Toon recente websites
+        function showRecentSites() {
+            currentView = 'recent';
+            shortcutsContainer.innerHTML = '';
+            
+            if (recentSites.length === 0) {
+                shortcutsContainer.innerHTML = '<p>Geen recente websites</p>';
+                return;
+            }
+            
+            recentSites.forEach(site => {
+                const siteElement = document.createElement('div');
+                siteElement.className = 'shortcut-item';
+                siteElement.setAttribute('data-url', site.url);
+                
+                siteElement.innerHTML = `
+                    <div class="shortcut-icon">
+                        ${site.icon || '🔗'}
+                    </div>
+                    <div class="shortcut-name">${site.name}</div>
+                `;
+                
+                siteElement.addEventListener('click', function() {
+                    window.location.href = this.getAttribute('data-url');
+                });
+                
+                shortcutsContainer.appendChild(siteElement);
+            });
+            
+            saveSettings();
+        }
+
+        // Toon snelkoppelingen
+        function showShortcuts() {
+            currentView = 'shortcuts';
+            const savedOrder = JSON.parse(localStorage.getItem('shortcutsOrder')) || Object.keys(defaultShortcuts);
+            loadShortcutsInOrder(savedOrder);
+            saveSettings();
+        }
+
+        // Verander achtergrond
+        function changeBackground() {
+            const randomIndex = Math.floor(Math.random() * backgrounds.length);
+            body.style.backgroundImage = backgrounds[randomIndex];
+        }
+
+        // Zoekfunctie
+        function performSearch(query) {
+            // Controleer op snelkoppelingen (zowel zichtbare als verborgen)
+            const normalizedQuery = query.toLowerCase().trim();
+            const allShortcuts = {...defaultShortcuts, ...hiddenShortcuts, ...JSON.parse(localStorage.getItem('customShortcuts') || '{}')};
+            
+            if (allShortcuts[normalizedQuery]) {
+                window.location.href = allShortcuts[normalizedQuery].url;
+                addToRecentSites(allShortcuts[normalizedQuery].name, allShortcuts[normalizedQuery].url);
+                return;
+            }
+            
+            // Anders doorsturen naar de gekozen zoekmachine
+            const searchEngine = searchEngineSelect.value;
+            const searchUrl = searchEngines[searchEngine].url + encodeURIComponent(query);
+            window.location.href = searchUrl;
+        }
+
+        // Event listeners
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                performSearch(this.value);
+                this.value = ''; // Maak leeg na zoeken
+            }
+        });
+
+        settingsToggle.addEventListener('click', function() {
+            settingsMenu.style.display = settingsMenu.style.display === 'block' ? 'none' : 'block';
+        });
+
+        searchEngineSelect.addEventListener('change', function() {
+            updateSearchPlaceholder();
+            saveSettings();
+        });
+
+        themeToggle.addEventListener('change', function() {
+            if (this.checked) {
+                body.classList.add('dark-mode');
+            } else {
+                body.classList.remove('dark-mode');
+            }
+            saveSettings();
+        });
+
+        addShortcutBtn.addEventListener('click', addNewShortcut);
+
+        newShortcutInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                addNewShortcut();
+            }
+        });
+
+        showShortcutsBtn.addEventListener('click', function() {
+            showShortcutsBtn.classList.add('active');
+            showRecentBtn.classList.remove('active');
+            showShortcuts();
+        });
+
+        showRecentBtn.addEventListener('click', function() {
+            showRecentBtn.classList.add('active');
+            showShortcutsBtn.classList.remove('active');
+            showRecentSites();
+        });
+
+        // Shift+Backspace om snelkoppeling te verwijderen
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Backspace' && e.shiftKey && currentHoveredShortcut && currentView === 'shortcuts') {
+                e.preventDefault();
+                const key = currentHoveredShortcut.getAttribute('data-key');
+                
+                // Markeer voor verwijdering
+                currentHoveredShortcut.classList.add('hover-delete');
+                
+                // Bevestig verwijdering
+                setTimeout(() => {
+                    if (currentHoveredShortcut && currentHoveredShortcut.classList.contains('hover-delete')) {
+                        deleteShortcut(key);
+                        currentHoveredShortcut = null;
+                    }
+                }, 500);
+            }
+        });
+
+        // Sluit instellingenmenu als er buiten wordt geklikt
+        document.addEventListener('click', function(e) {
+            if (!settingsToggle.contains(e.target) && !settingsMenu.contains(e.target)) {
+                settingsMenu.style.display = 'none';
+            }
+        });
+
+        // Initialisatie
+        loadSettings();
+        changeBackground();
+        
+        // Verander achtergrond elke minuut
+        setInterval(changeBackground, 60000);
+    </script>
+</body>
+</html>
