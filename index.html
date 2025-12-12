@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamische Achtergrond</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+            transition: background-image 1s ease-in-out;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+        
+        #datetime-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 20px;
+            border-radius: 12px;
+            min-width: 280px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 100;
+            transition: all 0.3s ease;
+        }
+        
+        /* Donker thema stijlen */
+        @media (prefers-color-scheme: dark) {
+            #datetime-container {
+                background-color: rgba(0, 0, 0, 0.7);
+                color: white;
+                border: 1px solid rgba(255, 255, 255, 0.15);
+            }
+            
+            .btn {
+                background-color: rgba(0, 0, 0, 0.7);
+                color: white;
+                border: 1px solid rgba(255, 255, 255, 0.15);
+            }
+            
+            .btn:hover {
+                background-color: rgba(0, 0, 0, 0.9);
+            }
+            
+            .search-container {
+                background-color: rgba(0, 0, 0, 0.7);
+                border: 1px solid rgba(255, 255, 255, 0.15);
+            }
+            
+            .search-input {
+                background-color: rgba(255, 255, 255, 0.1);
+                color: white;
+            }
+            
+            .search-input::placeholder {
+                color: rgba(255, 255, 255, 0.6);
+            }
+            
+            .settings-menu {
+                background-color: rgba(0, 0, 0, 0.9);
+                color: white;
+                border: 1px solid rgba(255, 255, 255, 0.15);
+            }
+            
+            .search-engine-option:hover {
+                background-color: rgba(255, 255, 255, 0.1);
+            }
+        }
+        
+        /* Licht thema stijlen */
+        @media (prefers-color-scheme: light) {
+            #datetime-container {
+                background-color: rgba(255, 255, 255, 0.7);
+                color: #222;
+                border: 1px solid rgba(0, 0, 0, 0.1);
+            }
+            
+            .btn {
+                background-color: rgba(255, 255, 255, 0.7);
+                color: #222;
+                border: 1px solid rgba(0, 0, 0, 0.1);
+            }
+            
+            .btn:hover {
+                background-color: rgba(255, 255, 255, 0.9);
+            }
+            
+            .search-container {
+                background-color: rgba(255, 255, 255, 0.7);
+                border: 1px solid rgba(0, 0, 0, 0.1);
+            }
+            
+            .search-input {
+                background-color: rgba(0, 0, 0, 0.05);
+                color: #222;
+            }
+            
+            .search-input::placeholder {
+                color: rgba(0, 0, 0, 0.6);
+            }
+            
+            .settings-menu {
+                background-color: rgba(255, 255, 255, 0.95);
+                color: #222;
+                border: 1px solid rgba(0, 0, 0, 0.1);
+            }
+            
+            .search-engine-option:hover {
+                background-color: rgba(0, 0, 0, 0.05);
+            }
+        }
+        
+        #time {
+            font-size: 2.8rem;
+            font-weight: 300;
+            letter-spacing: 2px;
+            margin-bottom: 5px;
+            text-align: right;
+            font-variant-numeric: tabular-nums;
+        }
+        
+        #date {
+            font-size: 1.3rem;
+            font-weight: 400;
+            text-align: right;
+            opacity: 0.9;
+        }
+        
+        /* Zoek container stijlen */
+        .search-container {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            border-radius: 50px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            padding: 8px;
+            width: 50px;
+            height: 50px;
+            overflow: hidden;
+        }
+        
+        .search-container:hover,
+        .search-container.expanded {
+            width: 350px;
+        }
+        
+        .search-icon {
+            width: 34px;
+            height: 34px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            cursor: pointer;
+            flex-shrink: 0;
+            border-radius: 50%;
+            transition: background-color 0.2s;
+        }
+        
+        .search-icon:hover {
+            background-color: rgba(128, 128, 128, 0.2);
+        }
+        
+        .search-input-container {
+            flex-grow: 1;
+            margin: 0 10px;
+            opacity: 0;
+            transform: translateX(-10px);
+            transition: all 0.3s ease;
+        }
+        
+        .search-container:hover .search-input-container,
+        .search-container.expanded .search-input-container {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        
+        .search-input {
+            width: 100%;
+            border: none;
+            outline: none;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 0.95rem;
+            backdrop-filter: blur(5px);
+        }
+        
+        .settings-button {
+            width: 34px;
+            height: 34px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            cursor: pointer;
+            flex-shrink: 0;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            opacity: 0;
+            transform: scale(0.8);
+        }
+        
+        .search-container:hover .settings-button,
+        .search-container.expanded .settings-button {
+            opacity: 1;
+            transform: scale(1);
+        }
+        
+        .settings-button:hover {
+            background-color: rgba(128, 128, 128, 0.2);
+            transform: scale(1.1) rotate(30deg);
+        }
+        
+        /* Settings menu */
+        .settings-menu {
+            position: absolute;
+            top: 60px;
+            right: 0;
+            width: 200px;
+            border-radius: 12px;
+            padding: 8px;
+            backdrop-filter: blur(15px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            z-index: 1000;
+            opacity: 0;
+            transform: translateY(-10px);
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .settings-menu.active {
+            opacity: 1;
+            transform: translateY(0);
+            visibility: visible;
+        }
+        
+        .settings-header {
+            padding: 8px 12px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            opacity: 0.8;
+            border-bottom: 1px solid currentColor;
+            margin-bottom: 8px;
+            opacity: 0.5;
+        }
+        
+        .search-engine-option {
+            display: flex;
+            align-items: center;
+            padding: 10px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            font-size: 0.9rem;
+        }
+        
+        .search-engine-option i {
+            margin-right: 10px;
+            font-size: 1rem;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .search-engine-option.selected::after {
+            content: "✓";
+            margin-left: auto;
+            font-weight: bold;
+        }
+        
+        /* Controls voor afbeeldingen */
+        .controls {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 100;
+        }
+        
+        .btn {
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+        }
+        
+        .notification {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 20px 30px;
+            border-radius: 12px;
+            font-size: 1.2rem;
+            text-align: center;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(15px);
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            pointer-events: none;
+        }
+        
+        .notification.show {
+            opacity: 1;
+        }
+        
+        .fullscreen-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.2);
+            z-index: 50;
+            pointer-events: none;
+        }
+        
+        @media (max-width: 768px) {
+            #datetime-container {
+                top: 10px;
+                right: 10px;
+                padding: 15px;
+                min-width: 240px;
+            }
+            
+            #time {
+                font-size: 2.2rem;
+            }
+            
+            #date {
+                font-size: 1.1rem;
+            }
+            
+            .search-container {
+                top: 10px;
+                left: 10px;
+            }
+            
+            .search-container:hover,
+            .search-container.expanded {
+                width: calc(100vw - 20px);
+                max-width: 350px;
+            }
+            
+            .controls {
+                bottom: 10px;
+                right: 10px;
+            }
+            
+            .btn {
+                width: 45px;
+                height: 45px;
+                font-size: 1.1rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            #datetime-container {
+                padding: 12px;
+                min-width: 200px;
+            }
+            
+            #time {
+                font-size: 1.8rem;
+            }
+            
+            #date {
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+    <!-- Font Awesome voor iconen -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body id="background">
+    <!-- Zoek container -->
+    <div class="search-container" id="searchContainer">
+        <div class="search-icon" id="searchIcon">
+            🔍
+        </div>
+        <div class="search-input-container">
+            <input type="text" class="search-input" id="searchInput" placeholder="Zoeken..." autocomplete="off">
+        </div>
+        <div class="settings-button" id="settingsButton">
+            ⚙️
+        </div>
+        
+        <!-- Settings menu -->
+        <div class="settings-menu" id="settingsMenu">
+            <div class="settings-header">Zoekmachine</div>
+            <div class="search-engine-option selected" data-engine="duckduckgo">
+                <i class="fab fa-searchengin"></i> DuckDuckGo
+            </div>
+            <div class="search-engine-option" data-engine="bing">
+                <i class="fab fa-microsoft"></i> Bing
+            </div>
+            <div class="search-engine-option" data-engine="google">
+                <i class="fab fa-google"></i> Google
+            </div>
+        </div>
+    </div>
+    
+    <!-- Tijd en datum weergave -->
+    <div id="datetime-container">
+        <div id="time">00:00:00</div>
+        <div id="date">1 januari 2023</div>
+    </div>
+    
+    <!-- Bedieningselementen voor achtergronden -->
+    <div class="controls">
+        <button class="btn" id="prev-btn" title="Vorige afbeelding">
+            ◀
+        </button>
+        <button class="btn" id="next-btn" title="Volgende afbeelding">
+            ▶
+        </button>
+        <button class="btn" id="pause-btn" title="Pauzeer automatische verandering">
+            ⏸
+        </button>
+    </div>
+    
+    <!-- Melding bij afbeelding verandering -->
+    <div class="notification" id="change-notification">
+        Achtergrond veranderd
+    </div>
+    
+    <!-- Overlay voor volledig scherm effect -->
+    <div class="fullscreen-overlay"></div>
+    
+    <script>
+        // Lijst met achtergrondafbeeldingen (Unsplash bronnen)
+        // Donkere thema afbeeldingen voor nacht/donker thema
+        const darkThemeImages = [
+            "https://images.unsplash.com/photo-1506102383123-c8ef1e872756?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80",
+            "https://images.unsplash.com/photo-1534088568595-a066f410bcda?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80",
+            "https://images.unsplash.com/photo-1462331940025-496dfbfc7564?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80",
+            "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80",
+            "https://images.unsplash.com/photo-1519681393784-d120267933ba?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80",
+            "https://images.unsplash.com/photo-1446776653964-20c1d3a81b06?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80"
+        ];
+        
+        // Lichte thema afbeeldingen voor dag/licht thema
+        const lightThemeImages = [
+            "https://images.unsplash.com/photo-1501854140801-50d01698950b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80",
+            "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80",
+            "https://images.unsplash.com/photo-1469474968028-56623f02e42e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80",
+            "https://images.unsplash.com/photo-1439066615861-d1af74d74000?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80",
+            "https://images.unsplash.com/photo-1506744038136-46273834b3fb?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80",
+            "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80"
+        ];
+        
+        // DOM-elementen
+        const bodyElement = document.getElementById('background');
+        const timeElement = document.getElementById('time');
+        const dateElement = document.getElementById('date');
+        const prevButton = document.getElementById('prev-btn');
+        const nextButton = document.getElementById('next-btn');
+        const pauseButton = document.getElementById('pause-btn');
+        const notificationElement = document.getElementById('change-notification');
+        
+        // Zoek gerelateerde elementen
+        const searchContainer = document.getElementById('searchContainer');
+        const searchIcon = document.getElementById('searchIcon');
+        const searchInput = document.getElementById('searchInput');
+        const settingsButton = document.getElementById('settingsButton');
+        const settingsMenu = document.getElementById('settingsMenu');
+        const searchEngineOptions = document.querySelectorAll('.search-engine-option');
+        
+        // Variabelen
+        let currentImageIndex = 0;
+        let autoChangeInterval;
+        let isAutoChangeActive = true;
+        const changeInterval = 60000; // 60 seconden (1 minuut)
+        let isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        let currentImages = isDarkMode ? darkThemeImages : lightThemeImages;
+        
+        // Zoekmachine instellingen
+        let selectedSearchEngine = 'duckduckgo'; // Default
+        
+        // Initialisatie functie
+        function init() {
+            // Controleer huidig thema
+            updateTheme();
+            
+            // Laad eerste afbeelding
+            changeBackgroundImage(currentImageIndex);
+            
+            // Start automatische verandering
+            startAutoChange();
+            
+            // Start klok
+            updateDateTime();
+            setInterval(updateDateTime, 1000);
+            
+            // Event listeners voor knoppen
+            prevButton.addEventListener('click', showPreviousImage);
+            nextButton.addEventListener('click', showNextImage);
+            pauseButton.addEventListener('click', toggleAutoChange);
+            
+            // Luister naar thema veranderingen
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', updateTheme);
+            
+            // Toetsenbord navigatie
+            document.addEventListener('keydown', handleKeyPress);
+            
+            // Zoek functionaliteit
+            setupSearchFunctionality();
+            
+            // Laad opgeslagen zoekvoorkeur
+            loadSearchPreference();
+        }
+        
+        // Setup zoek functionaliteit
+        function setupSearchFunctionality() {
+            // Hover effect voor zoekcontainer
+            searchContainer.addEventListener('mouseenter', () => {
+                searchContainer.classList.add('expanded');
+                searchInput.focus();
+            });
+            
+            // Blijf uitgeklapt als input focused is
+            searchInput.addEventListener('focus', () => {
+                searchContainer.classList.add('expanded');
+            });
+            
+            // Klik op zoekicoon
+            searchIcon.addEventListener('click', () => {
+                searchContainer.classList.add('expanded');
+                searchInput.focus();
+            });
+            
+            // Settings button
+            settingsButton.addEventListener('click', (e) => {
+                e.stopPropagation();
+                settingsMenu.classList.toggle('active');
+            });
+            
+            // Selecteer zoekmachine
+            searchEngineOptions.forEach(option => {
+                option.addEventListener('click', () => {
+                    // Verwijder selected class van alle opties
+                    searchEngineOptions.forEach(opt => opt.classList.remove('selected'));
+                    
+                    // Voeg selected class toe aan gekozen optie
+                    option.classList.add('selected');
+                    
+                    // Update geselecteerde zoekmachine
+                    selectedSearchEngine = option.getAttribute('data-engine');
+                    
+                    // Sla voorkeur op
+                    saveSearchPreference();
+                    
+                    // Verberg menu
+                    setTimeout(() => {
+                        settingsMenu.classList.remove('active');
+                    }, 300);
+                });
+            });
+            
+            // Zoek bij Enter
+            searchInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    performSearch();
+                }
+            });
+            
+            // Klik buiten settings menu om te sluiten
+            document.addEventListener('click', (e) => {
+                if (!settingsMenu.contains(e.target) && !settingsButton.contains(e.target)) {
+                    settingsMenu.classList.remove('active');
+                }
+            });
+            
+            // Verberg zoekbalk als er buiten wordt geklikt (behalve op mobiel)
+            if (window.innerWidth > 768) {
+                document.addEventListener('click', (e) => {
+                    if (!searchContainer.contains(e.target) && !searchInput.matches(':focus')) {
+                        searchContainer.classList.remove('expanded');
+                    }
+                });
+            }
+        }
+        
+        // Voer zoekopdracht uit
+        function performSearch() {
+            const query = searchInput.value.trim();
+            if (query === '') return;
+            
+            let searchUrl;
+            
+            // Kies de juiste zoek-URL op basis van geselecteerde engine
+            switch(selectedSearchEngine) {
+                case 'bing':
+                    searchUrl = `https://www.bing.com/search?q=${encodeURIComponent(query)}`;
+                    break;
+                case 'google':
+                    searchUrl = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+                    break;
+                case 'duckduckgo':
+                default:
+                    searchUrl = `https://duckduckgo.com/?q=${encodeURIComponent(query)}`;
+                    break;
+            }
+            
+            // Open zoekresultaten in een nieuw tabblad
+            window.open(searchUrl, '_blank');
+            
+            // Reset zoekveld
+            searchInput.value = '';
+            
+            // Verberg zoekbalk (op desktop)
+            if (window.innerWidth > 768) {
+                searchContainer.classList.remove('expanded');
+            }
+        }
+        
+        // Sla zoekvoorkeur op in localStorage
+        function saveSearchPreference() {
+            localStorage.setItem('searchEnginePreference', selectedSearchEngine);
+        }
+        
+        // Laad zoekvoorkeur uit localStorage
+        function loadSearchPreference() {
+            const savedPreference = localStorage.getItem('searchEnginePreference');
+            if (savedPreference) {
+                selectedSearchEngine = savedPreference;
+                
+                // Update UI
+                searchEngineOptions.forEach(option => {
+                    option.classList.remove('selected');
+                    if (option.getAttribute('data-engine') === selectedSearchEngine) {
+                        option.classList.add('selected');
+                    }
+                });
+            }
+        }
+        
+        // Update thema gebaseerd op systeem voorkeur
+        function updateTheme(event) {
+            isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            currentImages = isDarkMode ? darkThemeImages : lightThemeImages;
+            
+            // Reset naar eerste afbeelding bij thema wissel
+            currentImageIndex = 0;
+            changeBackgroundImage(currentImageIndex);
+            resetAutoChangeTimer();
+            
+            // Update pauze knop tekst
+            updatePauseButton();
+        }
+        
+        // Verander achtergrondafbeelding
+        function changeBackgroundImage(index) {
+            // Zorg dat index binnen bereik blijft
+            if (index < 0) index = currentImages.length - 1;
+            if (index >= currentImages.length) index = 0;
+            
+            currentImageIndex = index;
+            
+            // Update achtergrondafbeelding
+            bodyElement.style.backgroundImage = `url('${currentImages[currentImageIndex]}')`;
+            
+            // Toon melding
+            showNotification();
+        }
+        
+        // Toon vorige afbeelding
+        function showPreviousImage() {
+            changeBackgroundImage(currentImageIndex - 1);
+            resetAutoChangeTimer();
+        }
+        
+        // Toon volgende afbeelding
+        function showNextImage() {
+            changeBackgroundImage(currentImageIndex + 1);
+            resetAutoChangeTimer();
+        }
+        
+        // Start automatische verandering
+        function startAutoChange() {
+            if (autoChangeInterval) clearInterval(autoChangeInterval);
+            
+            autoChangeInterval = setInterval(() => {
+                showNextImage();
+            }, changeInterval);
+            
+            isAutoChangeActive = true;
+            updatePauseButton();
+        }
+        
+        // Pauzeer automatische verandering
+        function stopAutoChange() {
+            if (autoChangeInterval) {
+                clearInterval(autoChangeInterval);
+                autoChangeInterval = null;
+            }
+            
+            isAutoChangeActive = false;
+            updatePauseButton();
+        }
+        
+        // Wissel tussen automatische verandering aan/uit
+        function toggleAutoChange() {
+            if (isAutoChangeActive) {
+                stopAutoChange();
+            } else {
+                startAutoChange();
+            }
+        }
+        
+        // Reset automatische verandering timer
+        function resetAutoChangeTimer() {
+            if (isAutoChangeActive) {
+                stopAutoChange();
+                startAutoChange();
+            }
+        }
+        
+        // Update pauze knop weergave
+        function updatePauseButton() {
+            if (isAutoChangeActive) {
+                pauseButton.innerHTML = '⏸';
+                pauseButton.title = 'Pauzeer automatische verandering';
+            } else {
+                pauseButton.innerHTML = '▶';
+                pauseButton.title = 'Hervat automatische verandering';
+            }
+        }
+        
+        // Update tijd en datum
+        function updateDateTime() {
+            const now = new Date();
+            
+            // Formatteer tijd (HH:MM:SS)
+            const hours = now.getHours().toString().padStart(2, '0');
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            const seconds = now.getSeconds().toString().padStart(2, '0');
+            timeElement.textContent = `${hours}:${minutes}:${seconds}`;
+            
+            // Formatteer datum (dag maand jaar)
+            const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+            dateElement.textContent = now.toLocaleDateString('nl-NL', options);
+        }
+        
+        // Toon melding
+        function showNotification() {
+            notificationElement.classList.add('show');
+            
+            // Verberg melding na 2 seconden
+            setTimeout(() => {
+                notificationElement.classList.remove('show');
+            }, 2000);
+        }
+        
+        // Toetsenbord navigatie
+        function handleKeyPress(event) {
+            switch(event.key) {
+                case 'ArrowLeft':
+                    showPreviousImage();
+                    break;
+                case 'ArrowRight':
+                    showNextImage();
+                    break;
+                case ' ':
+                case 'Spacebar':
+                    event.preventDefault();
+                    toggleAutoChange();
+                    break;
+                case 'Escape':
+                    if (!isAutoChangeActive) {
+                        startAutoChange();
+                    }
+                    // Verberg zoekbalk
+                    searchContainer.classList.remove('expanded');
+                    settingsMenu.classList.remove('active');
+                    break;
+                case '/':
+                    // Focus zoekveld bij typen /
+                    if (!event.ctrlKey && !event.metaKey) {
+                        event.preventDefault();
+                        searchContainer.classList.add('expanded');
+                        searchInput.focus();
+                    }
+                    break;
+            }
+        }
+        
+        // Start applicatie wanneer pagina geladen is
+        window.addEventListener('DOMContentLoaded', init);
+        
+        // Preload afbeeldingen voor betere prestaties
+        function preloadImages() {
+            // Preload beide thema's
+            [...darkThemeImages, ...lightThemeImages].forEach(src => {
+                const img = new Image();
+                img.src = src;
+            });
+        }
+        
+        // Preload afbeeldingen
+        preloadImages();
+    </script>
+</body>
+</html>
