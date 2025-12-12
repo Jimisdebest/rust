@@ -313,27 +313,6 @@
             transform: translateY(-3px);
         }
         
-        .notification {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            padding: 20px 30px;
-            border-radius: 12px;
-            font-size: 1.2rem;
-            text-align: center;
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(15px);
-            z-index: 1000;
-            opacity: 0;
-            transition: opacity 0.5s ease;
-            pointer-events: none;
-        }
-        
-        .notification.show {
-            opacity: 1;
-        }
-        
         .fullscreen-overlay {
             position: fixed;
             top: 0;
@@ -449,11 +428,6 @@
         </button>
     </div>
     
-    <!-- Melding bij afbeelding verandering -->
-    <div class="notification" id="change-notification">
-        Achtergrond veranderd
-    </div>
-    
     <!-- Overlay voor volledig scherm effect -->
     <div class="fullscreen-overlay"></div>
     
@@ -486,7 +460,6 @@
         const prevButton = document.getElementById('prev-btn');
         const nextButton = document.getElementById('next-btn');
         const pauseButton = document.getElementById('pause-btn');
-        const notificationElement = document.getElementById('change-notification');
         
         // Zoek gerelateerde elementen
         const searchContainer = document.getElementById('searchContainer');
@@ -689,9 +662,6 @@
             
             // Update achtergrondafbeelding
             bodyElement.style.backgroundImage = `url('${currentImages[currentImageIndex]}')`;
-            
-            // Toon melding
-            showNotification();
         }
         
         // Toon vorige afbeelding
@@ -770,16 +740,6 @@
             // Formatteer datum (dag maand jaar)
             const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
             dateElement.textContent = now.toLocaleDateString('nl-NL', options);
-        }
-        
-        // Toon melding
-        function showNotification() {
-            notificationElement.classList.add('show');
-            
-            // Verberg melding na 2 seconden
-            setTimeout(() => {
-                notificationElement.classList.remove('show');
-            }, 2000);
         }
         
         // Toetsenbord navigatie
