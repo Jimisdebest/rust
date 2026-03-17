@@ -262,7 +262,7 @@
                 const response = await fetch('zoeksuggesties.txt');
                 
                 if (!response.ok) {
-                    throw new Error(`Kan zoeksuggesties.txt niet laden (status: ${response.status})`);
+                    throw new Error(`Kan zoeksuggesties niet laden (status: ${response.status})`);
                 }
                 
                 const text = await response.text();
