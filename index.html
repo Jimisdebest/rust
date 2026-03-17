@@ -469,12 +469,13 @@
         // Data structuur voor suggesties
         let suggesties = [];
         let huidigeAchtergrond = 0;
+        let volgendeAchtergrond = 0;
         let totaalAchtergronden = 10;
         let isAanHetWisselen = false;
         
         // Zoekmachine instellingen
         let zoekmachine = {
-            type: 'google', // google, bing, duckduckgo, yahoo, baidu, yandex, custom
+            type: 'google',
             customUrl: ''
         };
 
@@ -498,7 +499,8 @@
                     
                     // Update radio button
                     if (zoekmachine.type !== 'custom') {
-                        document.querySelector(`input[name="zoekmachine"][value="${zoekmachine.type}"]`).checked = true;
+                        const radio = document.querySelector(`input[name="zoekmachine"][value="${zoekmachine.type}"]`);
+                        if (radio) radio.checked = true;
                     }
                     
                     // Update custom URL veld
@@ -564,8 +566,14 @@
         function controleerAfbeelding(url) {
             return new Promise((resolve) => {
                 const img = new Image();
-                img.onload = () => resolve(true);
-                img.onerror = () => resolve(false);
+                img.onload = () => {
+                    console.log('Afbeelding geladen:', url);
+                    resolve(true);
+                };
+                img.onerror = () => {
+                    console.log('Afbeelding niet gevonden:', url);
+                    resolve(false);
+                };
                 img.src = url;
             });
         }
@@ -577,50 +585,63 @@
 
         // Achtergrond instellen met animatie
         async function wisselAchtergrond() {
-            if (isAanHetWisselen) return;
+            if (isAanHetWisselen) {
+                console.log('Bezig met wisselen...');
+                return;
+            }
             
             isAanHetWisselen = true;
+            console.log('Start achtergrond wissel...');
             
             let nieuwNummer;
             do {
                 nieuwNummer = kiesRandomAchtergrond();
             } while (nieuwNummer === huidigeAchtergrond && totaalAchtergronden > 1);
             
+            console.log('Nieuwe achtergrond nummer:', nieuwNummer);
             const pad = `afbeeldingen/${nieuwNummer}.png`;
+            console.log('Pad:', pad);
             
             const bestaat = await controleerAfbeelding(pad);
+            console.log('Afbeelding bestaat:', bestaat);
             
             if (bestaat) {
                 const bg1 = document.getElementById('bg1');
                 const bg2 = document.getElementById('bg2');
                 
                 const isBg1Active = bg1.classList.contains('active');
+                console.log('Bg1 actief:', isBg1Active);
                 
                 if (isBg1Active) {
                     bg2.style.backgroundImage = `url('${pad}')`;
                     bg2.classList.add('active');
                     bg1.classList.remove('active');
+                    console.log('Bg2 geactiveerd');
                 } else {
                     bg1.style.backgroundImage = `url('${pad}')`;
                     bg1.classList.add('active');
                     bg2.classList.remove('active');
+                    console.log('Bg1 geactiveerd');
                 }
                 
                 huidigeAchtergrond = nieuwNummer;
+                console.log('Nieuwe achtergrond ingesteld:', huidigeAchtergrond);
             } else {
+                console.log('Afbeelding niet gevonden, zoek andere...');
+                // Zoek een bestaande afbeelding
                 for (let i = 1; i <= totaalAchtergronden; i++) {
                     if (i !== nieuwNummer) {
                         const testPad = `afbeeldingen/${i}.png`;
                         const testBestaat = await controleerAfbeelding(testPad);
                         if (testBestaat) {
-                            huidigeAchtergrond = i;
-                            
+                            console.log('Gevonden alternatief:', i);
                             const bg1 = document.getElementById('bg1');
                             const bg2 = document.getElementById('bg2');
                             
                             bg1.style.backgroundImage = `url('${testPad}')`;
                             bg1.classList.add('active');
                             bg2.classList.remove('active');
+                            huidigeAchtergrond = i;
                             break;
                         }
                     }
@@ -628,29 +649,45 @@
             }
             
             isAanHetWisselen = false;
+            console.log('Wissel voltooid');
         }
 
         // Start achtergrond rotatie
         function startAchtergrondRotatie() {
+            console.log('Start achtergrond rotatie...');
+            
+            // Eerste achtergrond instellen
             setTimeout(async () => {
+                console.log('Eerste achtergrond zoeken...');
+                let gevonden = false;
+                
                 for (let i = 1; i <= totaalAchtergronden; i++) {
                     const testPad = `afbeeldingen/${i}.png`;
+                    console.log('Test afbeelding:', testPad);
                     const bestaat = await controleerAfbeelding(testPad);
                     if (bestaat) {
+                        console.log('Eerste achtergrond gevonden:', i);
                         document.getElementById('bg1').style.backgroundImage = `url('${testPad}')`;
                         document.getElementById('bg1').classList.add('active');
                         huidigeAchtergrond = i;
+                        gevonden = true;
                         break;
                     }
                 }
                 
-                if (huidigeAchtergrond === 0) {
+                if (!gevonden) {
+                    console.log('Geen achtergrondafbeeldingen gevonden');
                     document.getElementById('error').style.display = 'block';
-                    document.getElementById('error').textContent = 'Geen achtergrondafbeeldingen gevonden';
+                    document.getElementById('error').textContent = 'Geen achtergrondafbeeldingen gevonden in afbeeldingen/ map';
+                } else {
+                    console.log('Achtergrond succesvol geladen, start interval...');
+                    // Start interval voor wisselen
+                    setInterval(async () => {
+                        console.log('10 seconden interval - wissel achtergrond');
+                        await wisselAchtergrond();
+                    }, 10000);
                 }
-            }, 100);
-            
-            setInterval(wisselAchtergrond, 10000);
+            }, 500); // Iets langere timeout om zeker te zijn dat DOM geladen is
         }
 
         // Laad suggesties uit het txt bestand
@@ -662,6 +699,7 @@
                 loading.style.display = 'block';
                 error.style.display = 'none';
                 
+                console.log('Suggesties laden...');
                 const response = await fetch('zoeksuggesties.txt');
                 
                 if (!response.ok) {
@@ -696,6 +734,7 @@
                     }
                 }).filter(s => s !== null);
                 
+                console.log(`${suggesties.length} suggesties geladen`);
                 loading.style.display = 'none';
                 
             } catch (err) {
@@ -753,8 +792,11 @@
 
         // Event listeners
         document.addEventListener('DOMContentLoaded', () => {
+            console.log('DOM geladen, start applicatie...');
+            
             laadInstellingen();
             laadSuggesties().then(() => {
+                console.log('Suggesties geladen, start achtergrond...');
                 startAchtergrondRotatie();
             });
             
