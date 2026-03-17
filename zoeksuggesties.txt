@@ -1,2 +1,6 @@
 chatgpt = chatgpt.com
-voetbal
+snappet = app.snappet.org/subjectGroups
+copilot = copilot.com
+blooket = blooket.com
+Nu.nl = nu.nl
+ikea = ikea.com
