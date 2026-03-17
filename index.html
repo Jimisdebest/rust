@@ -181,6 +181,16 @@
         let huidigeAchtergrond = 0;
         let totaalAchtergronden = 10;
 
+        // Functie om ervoor te zorgen dat URL correct wordt geopend
+        function openURL(url) {
+            // Controleer of de URL begint met http:// of https://
+            if (url && !url.match(/^https?:\/\//i)) {
+                // Als het niet begint met http:// of https://, voeg https:// toe
+                url = 'https://' + url;
+            }
+            window.location.href = url;
+        }
+
         // Functie om te controleren of een afbeelding bestaat
         function controleerAfbeelding(url) {
             return new Promise((resolve) => {
@@ -272,7 +282,13 @@
                     
                     if (eersteGelijkteken !== -1) {
                         const tekst = regel.substring(0, eersteGelijkteken).trim();
-                        const url = regel.substring(eersteGelijkteken + 1).trim();
+                        let url = regel.substring(eersteGelijkteken + 1).trim();
+                        
+                        // Zorg dat de URL correct is
+                        if (url && !url.match(/^https?:\/\//i)) {
+                            url = 'https://' + url;
+                        }
+                        
                         return {
                             tekst: tekst,
                             url: url || null
@@ -333,7 +349,8 @@
             zoekveld.value = suggestie.tekst;
             
             if (suggestie.url) {
-                window.location.href = suggestie.url;
+                // Gebruik de openURL functie voor correcte redirect
+                openURL(suggestie.url);
             } else {
                 document.getElementById('suggesties-lijst').style.display = 'none';
                 voerZoekopdrachtUit(suggestie.tekst);
@@ -349,7 +366,8 @@
             );
             
             if (exacteMatch) {
-                window.location.href = exacteMatch.url;
+                // Gebruik de openURL functie voor correcte redirect
+                openURL(exacteMatch.url);
             } else {
                 window.location.href = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
             }
