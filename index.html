@@ -16,13 +16,37 @@
         body {
             font-family: 'Inter', sans-serif;
             min-height: 100vh;
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            background-attachment: fixed;
             display: flex;
             flex-direction: column;
             align-items: center;
+            position: relative;
+        }
+
+        /* Achtergrond container voor animaties */
+        .background-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .background-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            opacity: 0;
+            transition: opacity 1.5s ease-in-out;
+        }
+
+        .background-image.active {
+            opacity: 1;
         }
 
         .zoek-container {
@@ -30,6 +54,8 @@
             max-width: 600px;
             padding: 40px 20px 20px 20px;
             margin-top: 60px;
+            position: relative;
+            z-index: 1;
         }
 
         .zoek-wrapper {
@@ -94,6 +120,190 @@
             transform: translateY(-50%) scale(0.95);
         }
 
+        .instellingen-knop {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 48px;
+            height: 48px;
+            border: none;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            font-size: 24px;
+            backdrop-filter: blur(5px);
+            z-index: 100;
+        }
+
+        .instellingen-knop:hover {
+            background: rgba(0, 0, 0, 0.7);
+            transform: scale(1.1);
+        }
+
+        .instellingen-menu {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.9);
+            width: 90%;
+            max-width: 400px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 30px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .instellingen-menu.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .instellingen-menu h2 {
+            color: #1a1a1a;
+            margin-bottom: 20px;
+            font-weight: 500;
+            font-size: 24px;
+        }
+
+        .instellingen-menu h3 {
+            color: #666;
+            margin: 20px 0 10px 0;
+            font-weight: 500;
+            font-size: 16px;
+        }
+
+        .zoekmachine-opties {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .zoekmachine-optie {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            background: #f5f5f5;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 2px solid transparent;
+        }
+
+        .zoekmachine-optie:hover {
+            background: #e0e0e0;
+        }
+
+        .zoekmachine-optie.selected {
+            border-color: #007bff;
+            background: #e3f2fd;
+        }
+
+        .zoekmachine-optie input[type="radio"] {
+            margin-right: 12px;
+            accent-color: #007bff;
+        }
+
+        .zoekmachine-optie label {
+            flex: 1;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .zoekmachine-optie .url {
+            color: #666;
+            font-size: 12px;
+            margin-left: 10px;
+        }
+
+        .custom-zoekmachine {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .custom-zoekmachine input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 16px;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+
+        .custom-zoekmachine input:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+
+        .custom-zoekmachine button {
+            padding: 12px 20px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 16px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .custom-zoekmachine button:hover {
+            background: #0056b3;
+        }
+
+        .menu-sluiten {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 36px;
+            height: 36px;
+            border: none;
+            border-radius: 50%;
+            background: #f0f0f0;
+            color: #666;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            transition: all 0.2s ease;
+        }
+
+        .menu-sluiten:hover {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
         .suggesties {
             list-style: none;
             padding: 8px;
@@ -105,6 +315,18 @@
             overflow-y: auto;
             display: none;
             border: 1px solid rgba(0, 0, 0, 0.05);
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .suggesties li {
@@ -131,6 +353,7 @@
             border-radius: 50px;
             background: rgba(220, 53, 69, 0.9);
             display: none;
+            animation: fadeIn 0.3s ease-out;
         }
 
         .loading {
@@ -142,6 +365,16 @@
             border-radius: 50px;
             background: rgba(0, 0, 0, 0.5);
             display: none;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
         }
 
         /* Scrollbar styling */
@@ -165,6 +398,11 @@
     </style>
 </head>
 <body>
+    <div class="background-container">
+        <div id="bg1" class="background-image"></div>
+        <div id="bg2" class="background-image"></div>
+    </div>
+
     <div class="zoek-container">
         <div class="zoek-wrapper">
             <input type="text" id="zoekveld" class="zoekbalk" placeholder="Zoeken...">
@@ -175,20 +413,151 @@
         <div class="error" id="error"></div>
     </div>
 
+    <button class="instellingen-knop" id="instellingenKnop">⚙️</button>
+
+    <div class="overlay" id="overlay"></div>
+
+    <div class="instellingen-menu" id="instellingenMenu">
+        <button class="menu-sluiten" id="menuSluiten">✕</button>
+        <h2>Instellingen</h2>
+        
+        <h3>Kies zoekmachine</h3>
+        <div class="zoekmachine-opties" id="zoekmachineOpties">
+            <div class="zoekmachine-optie" data-engine="google">
+                <input type="radio" name="zoekmachine" id="engineGoogle" value="google" checked>
+                <label for="engineGoogle">🔍 Google</label>
+                <span class="url">google.com</span>
+            </div>
+            <div class="zoekmachine-optie" data-engine="bing">
+                <input type="radio" name="zoekmachine" id="engineBing" value="bing">
+                <label for="engineBing">🅱️ Bing</label>
+                <span class="url">bing.com</span>
+            </div>
+            <div class="zoekmachine-optie" data-engine="duckduckgo">
+                <input type="radio" name="zoekmachine" id="engineDuckDuckGo" value="duckduckgo">
+                <label for="engineDuckDuckGo">🦆 DuckDuckGo</label>
+                <span class="url">duckduckgo.com</span>
+            </div>
+            <div class="zoekmachine-optie" data-engine="yahoo">
+                <input type="radio" name="zoekmachine" id="engineYahoo" value="yahoo">
+                <label for="engineYahoo">📰 Yahoo</label>
+                <span class="url">yahoo.com</span>
+            </div>
+            <div class="zoekmachine-optie" data-engine="baidu">
+                <input type="radio" name="zoekmachine" id="engineBaidu" value="baidu">
+                <label for="engineBaidu">🐻 Baidu</label>
+                <span class="url">baidu.com</span>
+            </div>
+            <div class="zoekmachine-optie" data-engine="yandex">
+                <input type="radio" name="zoekmachine" id="engineYandex" value="yandex">
+                <label for="engineYandex">🇷🇺 Yandex</label>
+                <span class="url">yandex.com</span>
+            </div>
+        </div>
+
+        <h3>Eigen zoekmachine</h3>
+        <div class="custom-zoekmachine">
+            <input type="text" id="customEngineUrl" placeholder="https://example.com/search?q=">
+            <button id="customEngineOpslaan">Opslaan</button>
+        </div>
+        <div id="customEngineInfo" style="font-size: 12px; color: #666; margin-top: 5px;">
+            Gebruik {q} voor de zoekterm (bijv. https://google.com/search?q={q})
+        </div>
+    </div>
+
     <script>
         // Data structuur voor suggesties
         let suggesties = [];
         let huidigeAchtergrond = 0;
         let totaalAchtergronden = 10;
+        let isAanHetWisselen = false;
+        
+        // Zoekmachine instellingen
+        let zoekmachine = {
+            type: 'google', // google, bing, duckduckgo, yahoo, baidu, yandex, custom
+            customUrl: ''
+        };
+
+        // Zoekmachine URLs
+        const zoekmachineUrls = {
+            google: 'https://www.google.com/search?q={q}',
+            bing: 'https://www.bing.com/search?q={q}',
+            duckduckgo: 'https://duckduckgo.com/?q={q}',
+            yahoo: 'https://search.yahoo.com/search?p={q}',
+            baidu: 'https://www.baidu.com/s?wd={q}',
+            yandex: 'https://yandex.com/search/?text={q}'
+        };
+
+        // Laad opgeslagen instellingen
+        function laadInstellingen() {
+            const opgeslagen = localStorage.getItem('zoekmachineInstellingen');
+            if (opgeslagen) {
+                try {
+                    const instellingen = JSON.parse(opgeslagen);
+                    zoekmachine = instellingen;
+                    
+                    // Update radio button
+                    if (zoekmachine.type !== 'custom') {
+                        document.querySelector(`input[name="zoekmachine"][value="${zoekmachine.type}"]`).checked = true;
+                    }
+                    
+                    // Update custom URL veld
+                    document.getElementById('customEngineUrl').value = zoekmachine.customUrl || '';
+                } catch (e) {
+                    console.error('Fout bij laden instellingen:', e);
+                }
+            }
+        }
+
+        // Sla instellingen op
+        function opslaanInstellingen() {
+            localStorage.setItem('zoekmachineInstellingen', JSON.stringify(zoekmachine));
+        }
+
+        // Functie om zoekopdracht uit te voeren met gekozen zoekmachine
+        function voerZoekopdrachtUit(query) {
+            if (!query) return;
+            
+            // Eerst controleren op exacte match met suggestie die URL heeft
+            const exacteMatch = suggesties.find(s => 
+                s.tekst.toLowerCase() === query.toLowerCase() && s.url
+            );
+            
+            if (exacteMatch) {
+                openURL(exacteMatch.url);
+                return;
+            }
+            
+            // Anders gebruiken we de gekozen zoekmachine
+            let searchUrl;
+            
+            if (zoekmachine.type === 'custom' && zoekmachine.customUrl) {
+                searchUrl = zoekmachine.customUrl.replace('{q}', encodeURIComponent(query));
+            } else {
+                const baseUrl = zoekmachineUrls[zoekmachine.type] || zoekmachineUrls.google;
+                searchUrl = baseUrl.replace('{q}', encodeURIComponent(query));
+            }
+            
+            window.location.href = searchUrl;
+        }
 
         // Functie om ervoor te zorgen dat URL correct wordt geopend
         function openURL(url) {
-            // Controleer of de URL begint met http:// of https://
             if (url && !url.match(/^https?:\/\//i)) {
-                // Als het niet begint met http:// of https://, voeg https:// toe
                 url = 'https://' + url;
             }
             window.location.href = url;
+        }
+
+        // Menu openen/sluiten functies
+        function openMenu() {
+            document.getElementById('instellingenMenu').classList.add('active');
+            document.getElementById('overlay').classList.add('active');
+        }
+
+        function sluitMenu() {
+            document.getElementById('instellingenMenu').classList.remove('active');
+            document.getElementById('overlay').classList.remove('active');
         }
 
         // Functie om te controleren of een afbeelding bestaat
@@ -206,55 +575,82 @@
             return Math.floor(Math.random() * totaalAchtergronden) + 1;
         }
 
-        // Achtergrond instellen
-        async function setAchtergrond(nummer) {
-            const pad = `${nummer}.png`;
+        // Achtergrond instellen met animatie
+        async function wisselAchtergrond() {
+            if (isAanHetWisselen) return;
             
-            // Controleer of afbeelding bestaat
-            const bestaat = await controleerAfbeelding(pad);
+            isAanHetWisselen = true;
             
-            if (bestaat) {
-                document.body.style.backgroundImage = `url('${pad}')`;
-                huidigeAchtergrond = nummer;
-            } else {
-                // Probeer een andere afbeelding
-                for (let i = 1; i <= totaalAchtergronden; i++) {
-                    if (i !== nummer) {
-                        const testPad = `${i}.png`;
-                        const testBestaat = await controleerAfbeelding(testPad);
-                        if (testBestaat) {
-                            document.body.style.backgroundImage = `url('${testPad}')`;
-                            huidigeAchtergrond = i;
-                            return;
-                        }
-                    }
-                }
-                
-                // Geen enkele afbeelding gevonden
-                document.getElementById('error').style.display = 'block';
-                document.getElementById('error').textContent = 'Geen achtergrondafbeeldingen gevonden';
-            }
-        }
-
-        // Nieuwe random achtergrond laden
-        async function laadNieuweAchtergrond() {
             let nieuwNummer;
             do {
                 nieuwNummer = kiesRandomAchtergrond();
             } while (nieuwNummer === huidigeAchtergrond && totaalAchtergronden > 1);
             
-            await setAchtergrond(nieuwNummer);
+            const pad = `afbeeldingen/${nieuwNummer}.png`;
+            
+            const bestaat = await controleerAfbeelding(pad);
+            
+            if (bestaat) {
+                const bg1 = document.getElementById('bg1');
+                const bg2 = document.getElementById('bg2');
+                
+                const isBg1Active = bg1.classList.contains('active');
+                
+                if (isBg1Active) {
+                    bg2.style.backgroundImage = `url('${pad}')`;
+                    bg2.classList.add('active');
+                    bg1.classList.remove('active');
+                } else {
+                    bg1.style.backgroundImage = `url('${pad}')`;
+                    bg1.classList.add('active');
+                    bg2.classList.remove('active');
+                }
+                
+                huidigeAchtergrond = nieuwNummer;
+            } else {
+                for (let i = 1; i <= totaalAchtergronden; i++) {
+                    if (i !== nieuwNummer) {
+                        const testPad = `afbeeldingen/${i}.png`;
+                        const testBestaat = await controleerAfbeelding(testPad);
+                        if (testBestaat) {
+                            huidigeAchtergrond = i;
+                            
+                            const bg1 = document.getElementById('bg1');
+                            const bg2 = document.getElementById('bg2');
+                            
+                            bg1.style.backgroundImage = `url('${testPad}')`;
+                            bg1.classList.add('active');
+                            bg2.classList.remove('active');
+                            break;
+                        }
+                    }
+                }
+            }
+            
+            isAanHetWisselen = false;
         }
 
         // Start achtergrond rotatie
         function startAchtergrondRotatie() {
-            // Direct eerste achtergrond
-            setTimeout(() => {
-                laadNieuweAchtergrond();
+            setTimeout(async () => {
+                for (let i = 1; i <= totaalAchtergronden; i++) {
+                    const testPad = `afbeeldingen/${i}.png`;
+                    const bestaat = await controleerAfbeelding(testPad);
+                    if (bestaat) {
+                        document.getElementById('bg1').style.backgroundImage = `url('${testPad}')`;
+                        document.getElementById('bg1').classList.add('active');
+                        huidigeAchtergrond = i;
+                        break;
+                    }
+                }
+                
+                if (huidigeAchtergrond === 0) {
+                    document.getElementById('error').style.display = 'block';
+                    document.getElementById('error').textContent = 'Geen achtergrondafbeeldingen gevonden';
+                }
             }, 100);
             
-            // Elke minuut nieuwe achtergrond
-            setInterval(laadNieuweAchtergrond, 6000);
+            setInterval(wisselAchtergrond, 10000);
         }
 
         // Laad suggesties uit het txt bestand
@@ -269,7 +665,7 @@
                 const response = await fetch('zoeksuggesties.txt');
                 
                 if (!response.ok) {
-                    throw new Error(`Kan zoeksuggesties niet laden`);
+                    throw new Error(`Kan zoeksuggesties.txt niet laden`);
                 }
                 
                 const text = await response.text();
@@ -284,7 +680,6 @@
                         const tekst = regel.substring(0, eersteGelijkteken).trim();
                         let url = regel.substring(eersteGelijkteken + 1).trim();
                         
-                        // Zorg dat de URL correct is
                         if (url && !url.match(/^https?:\/\//i)) {
                             url = 'https://' + url;
                         }
@@ -349,7 +744,6 @@
             zoekveld.value = suggestie.tekst;
             
             if (suggestie.url) {
-                // Gebruik de openURL functie voor correcte redirect
                 openURL(suggestie.url);
             } else {
                 document.getElementById('suggesties-lijst').style.display = 'none';
@@ -357,25 +751,9 @@
             }
         }
 
-        // Voer zoekopdracht uit
-        function voerZoekopdrachtUit(query) {
-            if (!query) return;
-            
-            const exacteMatch = suggesties.find(s => 
-                s.tekst.toLowerCase() === query.toLowerCase() && s.url
-            );
-            
-            if (exacteMatch) {
-                // Gebruik de openURL functie voor correcte redirect
-                openURL(exacteMatch.url);
-            } else {
-                window.location.href = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
-            }
-        }
-
         // Event listeners
         document.addEventListener('DOMContentLoaded', () => {
-            // Eerst suggesties laden, dan achtergrond starten
+            laadInstellingen();
             laadSuggesties().then(() => {
                 startAchtergrondRotatie();
             });
@@ -383,6 +761,53 @@
             const zoekveld = document.getElementById('zoekveld');
             const suggestiesLijst = document.getElementById('suggesties-lijst');
             const zoekKnop = document.getElementById('zoek-knop');
+            const instellingenKnop = document.getElementById('instellingenKnop');
+            const menuSluiten = document.getElementById('menuSluiten');
+            const overlay = document.getElementById('overlay');
+            
+            // Ctrl+I shortcut
+            document.addEventListener('keydown', (e) => {
+                if (e.ctrlKey && e.key === 'i') {
+                    e.preventDefault();
+                    if (document.getElementById('instellingenMenu').classList.contains('active')) {
+                        sluitMenu();
+                    } else {
+                        openMenu();
+                    }
+                }
+            });
+            
+            // Menu openen/sluiten
+            instellingenKnop.addEventListener('click', openMenu);
+            menuSluiten.addEventListener('click', sluitMenu);
+            overlay.addEventListener('click', sluitMenu);
+            
+            // Zoekmachine keuze
+            const radioButtons = document.querySelectorAll('input[name="zoekmachine"]');
+            radioButtons.forEach(radio => {
+                radio.addEventListener('change', (e) => {
+                    if (e.target.checked) {
+                        zoekmachine.type = e.target.value;
+                        zoekmachine.customUrl = '';
+                        opslaanInstellingen();
+                    }
+                });
+            });
+            
+            // Custom zoekmachine opslaan
+            document.getElementById('customEngineOpslaan').addEventListener('click', () => {
+                const customUrl = document.getElementById('customEngineUrl').value.trim();
+                if (customUrl) {
+                    zoekmachine.type = 'custom';
+                    zoekmachine.customUrl = customUrl;
+                    opslaanInstellingen();
+                    
+                    // Deselecteer radio buttons
+                    radioButtons.forEach(radio => {
+                        radio.checked = false;
+                    });
+                }
+            });
             
             zoekveld.addEventListener('input', (e) => {
                 const input = e.target.value;
