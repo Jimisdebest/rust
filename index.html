@@ -19,22 +19,23 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: background-image 1s ease-in-out;
+            transition: background-image 0.5s ease-in-out;
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
-            backdrop-filter: blur(8px);
+            position: relative;
         }
 
-        body::before {
+        /* Aparte overlay voor het blur effect */
+        body::after {
             content: '';
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(10px);
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(8px);
             z-index: -1;
         }
 
@@ -42,6 +43,8 @@
             width: 100%;
             max-width: 600px;
             padding: 20px;
+            position: relative;
+            z-index: 1;
         }
 
         .zoek-wrapper {
@@ -57,9 +60,9 @@
             font-weight: 400;
             border: none;
             border-radius: 50px;
-            background: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.85);
             backdrop-filter: blur(10px);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
             transition: all 0.3s ease;
             color: #1a1a1a;
             letter-spacing: 0.3px;
@@ -68,14 +71,14 @@
         .zoekbalk:focus {
             outline: none;
             background: rgba(255, 255, 255, 0.95);
-            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.2);
             transform: scale(1.02);
         }
 
         .zoekbalk::placeholder {
-            color: #666;
+            color: #555;
             font-weight: 300;
-            opacity: 0.8;
+            opacity: 0.9;
         }
 
         .zoek-knop {
@@ -96,6 +99,7 @@
             transition: all 0.3s ease;
             box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
             font-size: 20px;
+            font-weight: bold;
         }
 
         .zoek-knop:hover {
@@ -112,14 +116,14 @@
             list-style: none;
             padding: 8px;
             margin: 12px 0 0 0;
-            background: rgba(255, 255, 255, 0.85);
+            background: rgba(255, 255, 255, 0.8);
             backdrop-filter: blur(10px);
             border-radius: 24px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
             max-height: 400px;
             overflow-y: auto;
             display: none;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
         }
 
         .suggesties li {
@@ -135,50 +139,34 @@
         .suggesties li:hover {
             background: rgba(255, 255, 255, 0.9);
             transform: translateX(5px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
 
-        .suggesties li:last-child {
-            border-bottom: none;
-        }
-
-        .info {
+        .info, .loading, .error {
             margin-top: 16px;
-            color: rgba(255, 255, 255, 0.9);
+            color: white;
             font-size: 14px;
             font-weight: 400;
             text-align: center;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-            backdrop-filter: blur(5px);
-            padding: 8px 16px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            padding: 8px 20px;
             border-radius: 50px;
-            background: rgba(0, 0, 0, 0.2);
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(5px);
             display: inline-block;
             margin-left: auto;
             margin-right: auto;
             width: auto;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .error {
-            color: #fff;
-            margin-top: 16px;
-            padding: 12px 20px;
-            background: rgba(220, 53, 69, 0.9);
-            backdrop-filter: blur(10px);
-            border-radius: 50px;
-            display: none;
-            text-align: center;
-            font-size: 14px;
+            background: rgba(220, 53, 69, 0.8);
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
         .loading {
-            color: #fff;
-            margin-top: 16px;
-            display: none;
-            text-align: center;
-            font-size: 14px;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            background: rgba(0, 123, 255, 0.3);
         }
 
         /* Scrollbar styling */
@@ -216,38 +204,85 @@
     <script>
         // Data structuur voor suggesties
         let suggesties = [];
-        let huidigeAchtergrond = 1;
+        let huidigeAchtergrond = 0;
         let totaalAchtergronden = 10; // Aantal beschikbare afbeeldingen
 
-        // Random achtergrond kiezen
+        // Functie om te controleren of een afbeelding bestaat
+        function controleerAfbeelding(url) {
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.onload = () => resolve(true);
+                img.onerror = () => resolve(false);
+                img.src = url;
+            });
+        }
+
+        // Random achtergrond kiezen (1-10)
         function kiesRandomAchtergrond() {
             return Math.floor(Math.random() * totaalAchtergronden) + 1;
         }
 
         // Achtergrond instellen
-        function setAchtergrond(nummer) {
-            const num = nummer.toString().padStart(1, '0');
-            document.body.style.backgroundImage = `url('afbeeldingen/${num}.png')`;
-            huidigeAchtergrond = nummer;
+        async function setAchtergrond(nummer) {
+            const loading = document.getElementById('loading');
+            const pad = `afbeeldingen/${nummer}.png`;
+            
+            loading.style.display = 'block';
+            loading.textContent = `Achtergrond ${nummer} laden...`;
+            
+            // Controleer of afbeelding bestaat
+            const bestaat = await controleerAfbeelding(pad);
+            
+            if (bestaat) {
+                document.body.style.backgroundImage = `url('${pad}')`;
+                huidigeAchtergrond = nummer;
+                loading.style.display = 'none';
+                document.getElementById('info').textContent = `Achtergrond: ${nummer}.png`;
+            } else {
+                console.log(`Afbeelding ${nummer}.png niet gevonden`);
+                loading.textContent = `Afbeelding ${nummer}.png niet gevonden, probeer volgende...`;
+                
+                // Probeer een andere afbeelding
+                for (let i = 1; i <= totaalAchtergronden; i++) {
+                    if (i !== nummer) {
+                        const testPad = `afbeeldingen/${i}.png`;
+                        const testBestaat = await controleerAfbeelding(testPad);
+                        if (testBestaat) {
+                            document.body.style.backgroundImage = `url('${testPad}')`;
+                            huidigeAchtergrond = i;
+                            loading.style.display = 'none';
+                            document.getElementById('info').textContent = `Achtergrond: ${i}.png`;
+                            return;
+                        }
+                    }
+                }
+                
+                // Geen enkele afbeelding gevonden
+                loading.style.display = 'none';
+                document.getElementById('error').style.display = 'block';
+                document.getElementById('error').textContent = 'Geen achtergrondafbeeldingen gevonden in afbeeldingen/ map';
+            }
         }
 
         // Nieuwe random achtergrond laden
-        function laadNieuweAchtergrond() {
+        async function laadNieuweAchtergrond() {
             let nieuwNummer;
             do {
                 nieuwNummer = kiesRandomAchtergrond();
             } while (nieuwNummer === huidigeAchtergrond && totaalAchtergronden > 1);
             
-            setAchtergrond(nieuwNummer);
+            await setAchtergrond(nieuwNummer);
         }
 
         // Start achtergrond rotatie
         function startAchtergrondRotatie() {
             // Direct eerste achtergrond
-            laadNieuweAchtergrond();
+            setTimeout(() => {
+                laadNieuweAchtergrond();
+            }, 100);
             
             // Elke minuut nieuwe achtergrond
-            setInterval(laadNieuweAchtergrond, 60000); // 60000ms = 1 minuut
+            setInterval(laadNieuweAchtergrond, 60000);
         }
 
         // Laad suggesties uit het txt bestand
@@ -257,12 +292,13 @@
             
             try {
                 loading.style.display = 'block';
+                loading.textContent = 'Suggesties laden...';
                 error.style.display = 'none';
                 
                 const response = await fetch('zoeksuggesties.txt');
                 
                 if (!response.ok) {
-                    throw new Error(`Kan zoeksuggesties niet laden (status: ${response.status})`);
+                    throw new Error(`Kan zoeksuggesties.txt niet laden`);
                 }
                 
                 const text = await response.text();
@@ -288,6 +324,10 @@
                     }
                 }).filter(s => s !== null);
                 
+                if (suggesties.length === 0) {
+                    throw new Error('Geen suggesties gevonden in bestand');
+                }
+                
                 loading.style.display = 'none';
                 document.getElementById('info').textContent = `${suggesties.length} suggesties geladen`;
                 
@@ -308,18 +348,15 @@
                 s.tekst.toLowerCase().includes(input)
             );
             
-            // Maximaal 10 suggesties
             return gevonden.slice(0, 10);
         }
 
         // Toon suggesties in de UI
         function toonSuggesties(suggestieLijst) {
             const lijst = document.getElementById('suggesties-lijst');
-            const info = document.getElementById('info');
             
             if (suggestieLijst.length === 0) {
                 lijst.style.display = 'none';
-                info.textContent = suggesties.length ? `${suggesties.length} suggesties beschikbaar` : '';
                 return;
             }
             
@@ -332,7 +369,6 @@
             });
             
             lijst.style.display = 'block';
-            info.textContent = `${suggestieLijst.length} suggestie(s)`;
         }
 
         // Verwerk geselecteerde suggestie
@@ -341,7 +377,6 @@
             zoekveld.value = suggestie.tekst;
             
             if (suggestie.url) {
-                // Direct naar de URL zonder extra pad toevoeging
                 window.location.href = suggestie.url;
             } else {
                 document.getElementById('suggesties-lijst').style.display = 'none';
@@ -358,7 +393,6 @@
             );
             
             if (exacteMatch) {
-                // Direct naar de URL zonder extra pad toevoeging
                 window.location.href = exacteMatch.url;
             } else {
                 window.location.href = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
@@ -367,43 +401,37 @@
 
         // Event listeners
         document.addEventListener('DOMContentLoaded', () => {
-            // Start achtergrond rotatie
-            startAchtergrondRotatie();
-            
-            // Laad suggesties
-            laadSuggesties();
+            // Eerst suggesties laden, dan achtergrond starten
+            laadSuggesties().then(() => {
+                startAchtergrondRotatie();
+            });
             
             const zoekveld = document.getElementById('zoekveld');
             const suggestiesLijst = document.getElementById('suggesties-lijst');
             const zoekKnop = document.getElementById('zoek-knop');
             
-            // Input event voor suggesties
             zoekveld.addEventListener('input', (e) => {
                 const input = e.target.value;
                 const gevondenSuggesties = zoekSuggesties(input);
                 toonSuggesties(gevondenSuggesties);
             });
             
-            // Zoekknop click event
             zoekKnop.addEventListener('click', () => {
                 voerZoekopdrachtUit(zoekveld.value);
             });
             
-            // Enter toets in zoekveld
             zoekveld.addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') {
                     voerZoekopdrachtUit(zoekveld.value);
                 }
             });
             
-            // Verberg suggesties bij klik buiten
             document.addEventListener('click', (e) => {
                 if (!zoekveld.contains(e.target) && !suggestiesLijst.contains(e.target)) {
                     suggestiesLijst.style.display = 'none';
                 }
             });
             
-            // Toon suggesties bij focus
             zoekveld.addEventListener('focus', () => {
                 if (zoekveld.value && suggesties.length > 0) {
                     const gevondenSuggesties = zoekSuggesties(zoekveld.value);
