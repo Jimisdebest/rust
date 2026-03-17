@@ -599,7 +599,7 @@
             } while (nieuwNummer === huidigeAchtergrond && totaalAchtergronden > 1);
             
             console.log('Nieuwe achtergrond nummer:', nieuwNummer);
-            const pad = `afbeeldingen/${nieuwNummer}.png`;
+            const pad = `${nieuwNummer}.png`;
             console.log('Pad:', pad);
             
             const bestaat = await controleerAfbeelding(pad);
