@@ -179,7 +179,7 @@
         // Data structuur voor suggesties
         let suggesties = [];
         let huidigeAchtergrond = 0;
-        let totaalAchtergronden = 10;
+        let totaalAchtergronden = 2;
 
         // Functie om ervoor te zorgen dat URL correct wordt geopend
         function openURL(url) {
@@ -208,7 +208,7 @@
 
         // Achtergrond instellen
         async function setAchtergrond(nummer) {
-            const pad = `afbeeldingen/${nummer}.png`;
+            const pad = `${nummer}.png`;
             
             // Controleer of afbeelding bestaat
             const bestaat = await controleerAfbeelding(pad);
