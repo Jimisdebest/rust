@@ -489,6 +489,9 @@
             yandex: 'https://yandex.com/search/?text={q}'
         };
 
+        // Lijst van mogelijke afbeelding extensies
+        const afbeeldingExtensies = ['.png', '.jpg', '.jpeg', '.gif', '.webp'];
+
         // Laad opgeslagen instellingen
         function laadInstellingen() {
             const opgeslagen = localStorage.getItem('zoekmachineInstellingen');
@@ -562,20 +565,21 @@
             document.getElementById('overlay').classList.remove('active');
         }
 
-        // Functie om te controleren of een afbeelding bestaat
-        function controleerAfbeelding(url) {
-            return new Promise((resolve) => {
-                const img = new Image();
-                img.onload = () => {
-                    console.log('Afbeelding geladen:', url);
-                    resolve(true);
-                };
-                img.onerror = () => {
-                    console.log('Afbeelding niet gevonden:', url);
-                    resolve(false);
-                };
-                img.src = url;
-            });
+        // Functie om te controleren of een afbeelding bestaat (met meerdere extensies)
+        async function vindAfbeelding(basisNaam) {
+            for (const ext of afbeeldingExtensies) {
+                const url = basisNaam + ext;
+                try {
+                    const response = await fetch(url, { method: 'HEAD' });
+                    if (response.ok) {
+                        console.log(`Afbeelding gevonden: ${url}`);
+                        return url;
+                    }
+                } catch (e) {
+                    // Negeer fouten
+                }
+            }
+            return null;
         }
 
         // Random achtergrond kiezen (1-10)
@@ -599,13 +603,11 @@
             } while (nieuwNummer === huidigeAchtergrond && totaalAchtergronden > 1);
             
             console.log('Nieuwe achtergrond nummer:', nieuwNummer);
-            const pad = `${nieuwNummer}.png`;
-            console.log('Pad:', pad);
             
-            const bestaat = await controleerAfbeelding(pad);
-            console.log('Afbeelding bestaat:', bestaat);
+            // Zoek afbeelding met mogelijke extensies
+            const afbeeldingUrl = await vindAfbeelding(`${nieuwNummer}`);
             
-            if (bestaat) {
+            if (afbeeldingUrl) {
                 const bg1 = document.getElementById('bg1');
                 const bg2 = document.getElementById('bg2');
                 
@@ -613,39 +615,21 @@
                 console.log('Bg1 actief:', isBg1Active);
                 
                 if (isBg1Active) {
-                    bg2.style.backgroundImage = `url('${pad}')`;
+                    bg2.style.backgroundImage = `url('${afbeeldingUrl}')`;
                     bg2.classList.add('active');
                     bg1.classList.remove('active');
-                    console.log('Bg2 geactiveerd');
+                    console.log('Bg2 geactiveerd met:', afbeeldingUrl);
                 } else {
-                    bg1.style.backgroundImage = `url('${pad}')`;
+                    bg1.style.backgroundImage = `url('${afbeeldingUrl}')`;
                     bg1.classList.add('active');
                     bg2.classList.remove('active');
-                    console.log('Bg1 geactiveerd');
+                    console.log('Bg1 geactiveerd met:', afbeeldingUrl);
                 }
                 
                 huidigeAchtergrond = nieuwNummer;
                 console.log('Nieuwe achtergrond ingesteld:', huidigeAchtergrond);
             } else {
-                console.log('Afbeelding niet gevonden, zoek andere...');
-                // Zoek een bestaande afbeelding
-                for (let i = 1; i <= totaalAchtergronden; i++) {
-                    if (i !== nieuwNummer) {
-                        const testPad = `${i}.png`;
-                        const testBestaat = await controleerAfbeelding(testPad);
-                        if (testBestaat) {
-                            console.log('Gevonden alternatief:', i);
-                            const bg1 = document.getElementById('bg1');
-                            const bg2 = document.getElementById('bg2');
-                            
-                            bg1.style.backgroundImage = `url('${testPad}')`;
-                            bg1.classList.add('active');
-                            bg2.classList.remove('active');
-                            huidigeAchtergrond = i;
-                            break;
-                        }
-                    }
-                }
+                console.log(`Geen afbeelding gevonden voor nummer ${nieuwNummer}`);
             }
             
             isAanHetWisselen = false;
@@ -662,12 +646,10 @@
                 let gevonden = false;
                 
                 for (let i = 1; i <= totaalAchtergronden; i++) {
-                    const testPad = `afbeeldingen/${i}.png`;
-                    console.log('Test afbeelding:', testPad);
-                    const bestaat = await controleerAfbeelding(testPad);
-                    if (bestaat) {
-                        console.log('Eerste achtergrond gevonden:', i);
-                        document.getElementById('bg1').style.backgroundImage = `url('${testPad}')`;
+                    const afbeeldingUrl = await vindAfbeelding(`${i}`);
+                    if (afbeeldingUrl) {
+                        console.log('Eerste achtergrond gevonden:', i, afbeeldingUrl);
+                        document.getElementById('bg1').style.backgroundImage = `url('${afbeeldingUrl}')`;
                         document.getElementById('bg1').classList.add('active');
                         huidigeAchtergrond = i;
                         gevonden = true;
@@ -678,7 +660,7 @@
                 if (!gevonden) {
                     console.log('Geen achtergrondafbeeldingen gevonden');
                     document.getElementById('error').style.display = 'block';
-                    document.getElementById('error').textContent = 'Geen achtergrondafbeeldingen gevonden in afbeeldingen/ map';
+                    document.getElementById('error').textContent = 'Geen achtergrondafbeeldingen gevonden (zoek naar 1.png, 1.jpg, etc.)';
                 } else {
                     console.log('Achtergrond succesvol geladen, start interval...');
                     // Start interval voor wisselen
@@ -687,7 +669,7 @@
                         await wisselAchtergrond();
                     }, 10000);
                 }
-            }, 500); // Iets langere timeout om zeker te zijn dat DOM geladen is
+            }, 500);
         }
 
         // Laad suggesties uit het txt bestand
