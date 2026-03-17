@@ -631,7 +631,7 @@
                 // Zoek een bestaande afbeelding
                 for (let i = 1; i <= totaalAchtergronden; i++) {
                     if (i !== nieuwNummer) {
-                        const testPad = `afbeeldingen/${i}.png`;
+                        const testPad = `${i}.png`;
                         const testBestaat = await controleerAfbeelding(testPad);
                         if (testBestaat) {
                             console.log('Gevonden alternatief:', i);
