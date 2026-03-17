@@ -220,7 +220,7 @@
                 // Probeer een andere afbeelding
                 for (let i = 1; i <= totaalAchtergronden; i++) {
                     if (i !== nummer) {
-                        const testPad = `afbeeldingen/${i}.png`;
+                        const testPad = `${i}.png`;
                         const testBestaat = await controleerAfbeelding(testPad);
                         if (testBestaat) {
                             document.body.style.backgroundImage = `url('${testPad}')`;
@@ -254,7 +254,7 @@
             }, 100);
             
             // Elke minuut nieuwe achtergrond
-            setInterval(laadNieuweAchtergrond, 60000);
+            setInterval(laadNieuweAchtergrond, 60);
         }
 
         // Laad suggesties uit het txt bestand
@@ -269,7 +269,7 @@
                 const response = await fetch('zoeksuggesties.txt');
                 
                 if (!response.ok) {
-                    throw new Error(`Kan zoeksuggesties.txt niet laden`);
+                    throw new Error(`Kan zoeksuggesties niet laden`);
                 }
                 
                 const text = await response.text();
