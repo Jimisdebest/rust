@@ -20,6 +20,39 @@
             flex-direction: column;
             align-items: center;
             position: relative;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* Licht thema (default) */
+        body {
+            background-color: #f5f5f5;
+            color: #1a1a1a;
+        }
+
+        /* Donker thema - op basis van systeem voorkeur */
+        @media (prefers-color-scheme: dark) {
+            body {
+                background-color: #1a1a1a;
+                color: #ffffff;
+            }
+            
+            /* Fade-in vanaf zwart voor donker thema */
+            .background-image {
+                opacity: 0;
+                transition: opacity 1.5s ease-in-out;
+                animation: fadeFromBlack 2s ease-in-out;
+            }
+            
+            @keyframes fadeFromBlack {
+                0% {
+                    opacity: 0;
+                    background-color: black;
+                }
+                100% {
+                    opacity: 1;
+                    background-color: transparent;
+                }
+            }
         }
 
         /* Achtergrond container voor animaties */
@@ -71,17 +104,42 @@
             font-weight: 400;
             border: none;
             border-radius: 50px;
+            transition: all 0.3s ease;
+            color: inherit;
+            letter-spacing: 0.3px;
+        }
+
+        /* Licht thema zoekbalk */
+        .zoekbalk {
             background: rgba(255, 255, 255, 0.9);
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-            transition: all 0.3s ease;
             color: #1a1a1a;
-            letter-spacing: 0.3px;
+        }
+
+        /* Donker thema zoekbalk */
+        @media (prefers-color-scheme: dark) {
+            .zoekbalk {
+                background: rgba(30, 30, 30, 0.9);
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+                color: #ffffff;
+            }
+            
+            .zoekbalk::placeholder {
+                color: #aaa;
+            }
         }
 
         .zoekbalk:focus {
             outline: none;
             background: rgba(255, 255, 255, 1);
             box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .zoekbalk:focus {
+                background: rgba(40, 40, 40, 1);
+                box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+            }
         }
 
         .zoekbalk::placeholder {
@@ -128,8 +186,6 @@
             height: 48px;
             border: none;
             border-radius: 50%;
-            background: rgba(0, 0, 0, 0.5);
-            color: white;
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -140,8 +196,25 @@
             z-index: 100;
         }
 
+        /* Licht thema instellingen knop */
+        .instellingen-knop {
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+        }
+
+        /* Donker thema instellingen knop */
+        @media (prefers-color-scheme: dark) {
+            .instellingen-knop {
+                background: rgba(255, 255, 255, 0.2);
+                color: white;
+            }
+            
+            .instellingen-knop:hover {
+                background: rgba(255, 255, 255, 0.3);
+            }
+        }
+
         .instellingen-knop:hover {
-            background: rgba(0, 0, 0, 0.7);
             transform: scale(1.1);
         }
 
@@ -152,7 +225,6 @@
             transform: translate(-50%, -50%) scale(0.9);
             width: 90%;
             max-width: 400px;
-            background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
             border-radius: 30px;
             padding: 30px;
@@ -163,6 +235,29 @@
             transition: all 0.3s ease;
         }
 
+        /* Licht thema menu */
+        .instellingen-menu {
+            background: rgba(255, 255, 255, 0.95);
+            color: #1a1a1a;
+        }
+
+        /* Donker thema menu */
+        @media (prefers-color-scheme: dark) {
+            .instellingen-menu {
+                background: rgba(30, 30, 30, 0.95);
+                color: #ffffff;
+            }
+            
+            .instellingen-menu h2,
+            .instellingen-menu h3 {
+                color: #ffffff;
+            }
+            
+            .instellingen-menu h3 {
+                color: #ccc;
+            }
+        }
+
         .instellingen-menu.active {
             opacity: 1;
             visibility: visible;
@@ -170,14 +265,12 @@
         }
 
         .instellingen-menu h2 {
-            color: #1a1a1a;
             margin-bottom: 20px;
             font-weight: 500;
             font-size: 24px;
         }
 
         .instellingen-menu h3 {
-            color: #666;
             margin: 20px 0 10px 0;
             font-weight: 500;
             font-size: 16px;
@@ -194,11 +287,15 @@
             display: flex;
             align-items: center;
             padding: 12px 16px;
-            background: #f5f5f5;
             border-radius: 16px;
             cursor: pointer;
             transition: all 0.2s ease;
             border: 2px solid transparent;
+        }
+
+        /* Licht thema opties */
+        .zoekmachine-optie {
+            background: #f5f5f5;
         }
 
         .zoekmachine-optie:hover {
@@ -208,6 +305,27 @@
         .zoekmachine-optie.selected {
             border-color: #007bff;
             background: #e3f2fd;
+        }
+
+        /* Donker thema opties */
+        @media (prefers-color-scheme: dark) {
+            .zoekmachine-optie {
+                background: #2a2a2a;
+                color: #ffffff;
+            }
+            
+            .zoekmachine-optie:hover {
+                background: #3a3a3a;
+            }
+            
+            .zoekmachine-optie.selected {
+                border-color: #007bff;
+                background: #1a3a5a;
+            }
+            
+            .zoekmachine-optie .url {
+                color: #aaa;
+            }
         }
 
         .zoekmachine-optie input[type="radio"] {
@@ -243,6 +361,20 @@
             transition: all 0.2s ease;
         }
 
+        /* Donker thema custom input */
+        @media (prefers-color-scheme: dark) {
+            .custom-zoekmachine input {
+                background: #2a2a2a;
+                border-color: #444;
+                color: #ffffff;
+            }
+            
+            .custom-zoekmachine input:focus {
+                border-color: #007bff;
+                background: #333;
+            }
+        }
+
         .custom-zoekmachine input:focus {
             outline: none;
             border-color: #007bff;
@@ -271,8 +403,6 @@
             height: 36px;
             border: none;
             border-radius: 50%;
-            background: #f0f0f0;
-            color: #666;
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -281,9 +411,28 @@
             transition: all 0.2s ease;
         }
 
+        /* Licht thema sluit knop */
+        .menu-sluiten {
+            background: #f0f0f0;
+            color: #666;
+        }
+
         .menu-sluiten:hover {
             background: #e0e0e0;
             color: #333;
+        }
+
+        /* Donker thema sluit knop */
+        @media (prefers-color-scheme: dark) {
+            .menu-sluiten {
+                background: #333;
+                color: #ccc;
+            }
+            
+            .menu-sluiten:hover {
+                background: #444;
+                color: #fff;
+            }
         }
 
         .overlay {
@@ -308,7 +457,6 @@
             list-style: none;
             padding: 8px;
             margin: 12px 0 0 0;
-            background: rgba(255, 255, 255, 0.95);
             border-radius: 24px;
             box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
             max-height: 400px;
@@ -316,6 +464,45 @@
             display: none;
             border: 1px solid rgba(0, 0, 0, 0.05);
             animation: slideDown 0.3s ease-out;
+        }
+
+        /* Licht thema suggesties */
+        .suggesties {
+            background: rgba(255, 255, 255, 0.95);
+        }
+
+        .suggesties li {
+            padding: 12px 20px;
+            cursor: pointer;
+            border-radius: 16px;
+            transition: all 0.2s ease;
+            margin: 2px 0;
+        }
+
+        /* Licht thema suggestie items */
+        .suggesties li {
+            color: #1a1a1a;
+        }
+
+        .suggesties li:hover {
+            background: #f0f0f0;
+            transform: translateX(5px);
+        }
+
+        /* Donker thema suggesties */
+        @media (prefers-color-scheme: dark) {
+            .suggesties {
+                background: rgba(30, 30, 30, 0.95);
+                border-color: rgba(255, 255, 255, 0.1);
+            }
+            
+            .suggesties li {
+                color: #ffffff;
+            }
+            
+            .suggesties li:hover {
+                background: #3a3a3a;
+            }
         }
 
         @keyframes slideDown {
@@ -327,21 +514,6 @@
                 opacity: 1;
                 transform: translateY(0);
             }
-        }
-
-        .suggesties li {
-            padding: 12px 20px;
-            cursor: pointer;
-            border-radius: 16px;
-            color: #1a1a1a;
-            font-weight: 400;
-            transition: all 0.2s ease;
-            margin: 2px 0;
-        }
-
-        .suggesties li:hover {
-            background: #f0f0f0;
-            transform: translateX(5px);
         }
 
         .error {
@@ -358,14 +530,26 @@
 
         .loading {
             margin-top: 16px;
-            color: white;
             font-size: 14px;
             text-align: center;
             padding: 8px 20px;
             border-radius: 50px;
-            background: rgba(0, 0, 0, 0.5);
             display: none;
             animation: fadeIn 0.3s ease-out;
+        }
+
+        /* Licht thema loading */
+        .loading {
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+        }
+
+        /* Donker thema loading */
+        @media (prefers-color-scheme: dark) {
+            .loading {
+                background: rgba(255, 255, 255, 0.2);
+                color: white;
+            }
         }
 
         @keyframes fadeIn {
@@ -394,6 +578,32 @@
 
         .suggesties::-webkit-scrollbar-thumb:hover {
             background: #555;
+        }
+
+        /* Donker thema scrollbar */
+        @media (prefers-color-scheme: dark) {
+            .suggesties::-webkit-scrollbar-track {
+                background: #2a2a2a;
+            }
+            
+            .suggesties::-webkit-scrollbar-thumb {
+                background: #666;
+            }
+            
+            .suggesties::-webkit-scrollbar-thumb:hover {
+                background: #888;
+            }
+        }
+        
+        #customEngineInfo {
+            font-size: 12px;
+            margin-top: 5px;
+        }
+        
+        @media (prefers-color-scheme: dark) {
+            #customEngineInfo {
+                color: #aaa !important;
+            }
         }
     </style>
 </head>
@@ -469,7 +679,6 @@
         // Data structuur voor suggesties
         let suggesties = [];
         let huidigeAchtergrond = 0;
-        let volgendeAchtergrond = 0;
         let totaalAchtergronden = 10;
         let isAanHetWisselen = false;
         
