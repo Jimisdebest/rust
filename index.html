@@ -32,7 +32,7 @@
         /* Donker thema - op basis van systeem voorkeur */
         @media (prefers-color-scheme: dark) {
             body {
-                background-color: #1a1a1a;
+                background-color: #0a0a0a; /* Donkerder dan voorheen */
                 color: #ffffff;
             }
             
@@ -85,8 +85,8 @@
         .zoek-container {
             width: 100%;
             max-width: 600px;
-            padding: 40px 20px 20px 20px;
-            margin-top: 60px;
+            padding: 20px 20px 20px 20px;
+            margin-top: 20px; /* Verkleind van 60px naar 20px */
             position: relative;
             z-index: 1;
         }
@@ -119,8 +119,8 @@
         /* Donker thema zoekbalk */
         @media (prefers-color-scheme: dark) {
             .zoekbalk {
-                background: rgba(30, 30, 30, 0.9);
-                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+                background: rgba(20, 20, 20, 0.95); /* Donkerder */
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.8);
                 color: #ffffff;
             }
             
@@ -137,7 +137,7 @@
 
         @media (prefers-color-scheme: dark) {
             .zoekbalk:focus {
-                background: rgba(40, 40, 40, 1);
+                background: rgba(30, 30, 30, 1);
                 box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
             }
         }
@@ -156,22 +156,45 @@
             height: 48px;
             border: none;
             border-radius: 50%;
-            background: #007bff;
-            color: white;
+            background: transparent; /* Transparante achtergrond */
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
-            font-size: 20px;
-            font-weight: bold;
+            font-size: 0; /* Verberg tekst */
+            padding: 8px;
+        }
+
+        /* Zoekknop afbeelding - basis stijl (voor licht thema) */
+        .zoek-knop::before {
+            content: "";
+            display: block;
+            width: 100%;
+            height: 100%;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="black"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            transition: all 0.3s ease;
+        }
+
+        /* Donker thema - wit vergrootglas */
+        @media (prefers-color-scheme: dark) {
+            .zoek-knop::before {
+                background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>');
+            }
         }
 
         .zoek-knop:hover {
-            background: #0056b3;
-            transform: translateY(-50%) scale(1.05);
-            box-shadow: 0 6px 20px rgba(0, 123, 255, 0.4);
+            transform: translateY(-50%) scale(1.1);
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .zoek-knop:hover {
+                background: rgba(255, 255, 255, 0.1);
+            }
         }
 
         .zoek-knop:active {
@@ -244,7 +267,7 @@
         /* Donker thema menu */
         @media (prefers-color-scheme: dark) {
             .instellingen-menu {
-                background: rgba(30, 30, 30, 0.95);
+                background: rgba(20, 20, 20, 0.98); /* Donkerder */
                 color: #ffffff;
             }
             
@@ -492,7 +515,7 @@
         /* Donker thema suggesties */
         @media (prefers-color-scheme: dark) {
             .suggesties {
-                background: rgba(30, 30, 30, 0.95);
+                background: rgba(20, 20, 20, 0.98); /* Donkerder */
                 border-color: rgba(255, 255, 255, 0.1);
             }
             
@@ -616,7 +639,7 @@
     <div class="zoek-container">
         <div class="zoek-wrapper">
             <input type="text" id="zoekveld" class="zoekbalk" placeholder="Zoeken...">
-            <button id="zoek-knop" class="zoek-knop">→</button>
+            <button id="zoek-knop" class="zoek-knop" aria-label="Zoeken"></button>
         </div>
         <ul id="suggesties-lijst" class="suggesties"></ul>
         <div class="loading" id="loading">Bezig met laden...</div>
