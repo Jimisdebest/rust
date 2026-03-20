@@ -82,8 +82,6 @@
             opacity: 1;
         }
 
-        /* ===== NIEUWE STIJLEN VOOR KLOK, WEER EN OFFLINE MELDING ===== */
-        
         /* Linksonder - Klok */
         .clock-container {
             position: fixed;
@@ -108,55 +106,6 @@
                 background: rgba(0, 0, 0, 0.7);
                 box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
             }
-        }
-        
-        /* Weer widget - linksonder naast/onder de klok */
-        .weather-container {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            transform: translateY(80px);
-            z-index: 100;
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(10px);
-            padding: 10px 20px;
-            border-radius: 50px;
-            color: white;
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            transition: all 0.3s ease;
-            font-family: 'Inter', sans-serif;
-        }
-        
-        @media (min-width: 768px) {
-            .weather-container {
-                transform: translateY(90px);
-            }
-        }
-        
-        .weather-icon {
-            font-size: 1.4rem;
-        }
-        
-        .weather-temp {
-            font-weight: 600;
-            font-size: 1.1rem;
-        }
-        
-        .weather-location {
-            font-size: 0.8rem;
-            opacity: 0.9;
-            max-width: 150px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        
-        .weather-error {
-            font-size: 0.8rem;
-            opacity: 0.8;
         }
         
         /* Offline melding - rechtsboven */
@@ -199,24 +148,6 @@
                 transform: translateX(0);
                 opacity: 1;
             }
-        }
-        
-        /* Laad indicator voor weer */
-        .weather-loading {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .weather-loading::after {
-            content: "...";
-            animation: dots 1.5s steps(4, end) infinite;
-        }
-        
-        @keyframes dots {
-            0%, 20% { content: "."; }
-            40% { content: ".."; }
-            60%, 100% { content: "..."; }
         }
         
         .zoek-container {
@@ -301,22 +232,11 @@
             padding: 8px;
         }
 
-        .zoek-knop::before {
-            content: "";
-            display: block;
+        .zoek-knop img {
             width: 100%;
             height: 100%;
-            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="black"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>');
-            background-size: contain;
-            background-repeat: no-repeat;
-            background-position: center;
+            object-fit: contain;
             transition: all 0.3s ease;
-        }
-
-        @media (prefers-color-scheme: dark) {
-            .zoek-knop::before {
-                background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>');
-            }
         }
 
         .zoek-knop:hover {
@@ -432,7 +352,7 @@
             display: flex;
             flex-direction: column;
             gap: 10px;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
         }
 
         .zoekmachine-optie {
@@ -493,55 +413,6 @@
             color: #666;
             font-size: 12px;
             margin-left: 10px;
-        }
-
-        .custom-zoekmachine {
-            display: flex;
-            gap: 10px;
-            margin-top: 10px;
-        }
-
-        .custom-zoekmachine input {
-            flex: 1;
-            padding: 12px 16px;
-            border: 2px solid #e0e0e0;
-            border-radius: 16px;
-            font-family: 'Inter', sans-serif;
-            font-size: 14px;
-            transition: all 0.2s ease;
-        }
-
-        @media (prefers-color-scheme: dark) {
-            .custom-zoekmachine input {
-                background: #2a2a2a;
-                border-color: #444;
-                color: #ffffff;
-            }
-            
-            .custom-zoekmachine input:focus {
-                border-color: #007bff;
-                background: #333;
-            }
-        }
-
-        .custom-zoekmachine input:focus {
-            outline: none;
-            border-color: #007bff;
-        }
-
-        .custom-zoekmachine button {
-            padding: 12px 20px;
-            background: #007bff;
-            color: white;
-            border: none;
-            border-radius: 16px;
-            cursor: pointer;
-            font-weight: 500;
-            transition: all 0.2s ease;
-        }
-
-        .custom-zoekmachine button:hover {
-            background: #0056b3;
         }
 
         .menu-sluiten {
@@ -735,17 +606,6 @@
             }
         }
         
-        #customEngineInfo {
-            font-size: 12px;
-            margin-top: 5px;
-        }
-        
-        @media (prefers-color-scheme: dark) {
-            #customEngineInfo {
-                color: #aaa !important;
-            }
-        }
-        
         /* Responsive aanpassingen */
         @media (max-width: 600px) {
             .clock-container {
@@ -753,18 +613,6 @@
                 padding: 8px 16px;
                 bottom: 10px;
                 left: 10px;
-            }
-            
-            .weather-container {
-                bottom: 10px;
-                left: 10px;
-                transform: translateY(60px);
-                padding: 6px 12px;
-                font-size: 0.75rem;
-            }
-            
-            .weather-location {
-                max-width: 120px;
             }
             
             .offline-toast {
@@ -785,13 +633,6 @@
     <!-- Klok widget -->
     <div class="clock-container" id="clock">--:--</div>
     
-    <!-- Weer widget -->
-    <div class="weather-container" id="weather">
-        <span class="weather-icon">🌡️</span>
-        <span class="weather-temp" id="weatherTemp">--°C</span>
-        <span class="weather-location" id="weatherLocation">Locatie laden...</span>
-    </div>
-    
     <!-- Offline melding -->
     <div class="offline-toast" id="offlineToast">
         <span>⚠️</span>
@@ -801,7 +642,9 @@
     <div class="zoek-container">
         <div class="zoek-wrapper">
             <input type="text" id="zoekveld" class="zoekbalk" placeholder="Zoeken...">
-            <button id="zoek-knop" class="zoek-knop" aria-label="Zoeken"></button>
+            <button id="zoek-knop" class="zoek-knop" aria-label="Zoeken">
+                <img id="zoekIcoon" src="zwartezoekknop.png" alt="Zoeken">
+            </button>
         </div>
         <ul id="suggesties-lijst" class="suggesties"></ul>
         <div class="loading" id="loading">Bezig met laden...</div>
@@ -838,29 +681,28 @@
                 <label for="engineYahoo">📰 Yahoo</label>
                 <span class="url">yahoo.com</span>
             </div>
-            <div class="zoekmachine-optie" data-engine="baidu">
-                <input type="radio" name="zoekmachine" id="engineBaidu" value="baidu">
-                <label for="engineBaidu">🐻 Baidu</label>
-                <span class="url">baidu.com</span>
-            </div>
-            <div class="zoekmachine-optie" data-engine="yandex">
-                <input type="radio" name="zoekmachine" id="engineYandex" value="yandex">
-                <label for="engineYandex">🇷🇺 Yandex</label>
-                <span class="url">yandex.com</span>
-            </div>
-        </div>
-
-        <h3>Eigen zoekmachine</h3>
-        <div class="custom-zoekmachine">
-            <input type="text" id="customEngineUrl" placeholder="https://example.com/search?q=">
-            <button id="customEngineOpslaan">Opslaan</button>
-        </div>
-        <div id="customEngineInfo" style="font-size: 12px; color: #666; margin-top: 5px;">
-            Gebruik {q} voor de zoekterm (bijv. https://google.com/search?q={q})
         </div>
     </div>
 
     <script>
+        // ===== ZOEKICOON AANPASSEN OP BASIS VAN THEMA =====
+        function updateZoekIcoon() {
+            const zoekIcoon = document.getElementById('zoekIcoon');
+            const isDonker = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            
+            if (isDonker) {
+                zoekIcoon.src = 'wittezoekknop.png';
+            } else {
+                zoekIcoon.src = 'zwartezoekknop.png';
+            }
+        }
+        
+        // Update bij laden
+        updateZoekIcoon();
+        
+        // Luister naar thema veranderingen (sommige browsers ondersteunen dit)
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', updateZoekIcoon);
+        
         // ===== KLOK FUNCTIE =====
         function updateClock() {
             const now = new Date();
@@ -871,123 +713,33 @@
         updateClock();
         setInterval(updateClock, 1000);
         
-        // ===== WEER FUNCTIE =====
-        let weatherInterval = null;
-        
-        async function getWeather(lat, lon) {
-            try {
-                // Gebruik Open-Meteo API (gratis, geen API key nodig)
-                const response = await fetch(
-                    `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&timezone=auto`
-                );
-                
-                if (!response.ok) throw new Error('Weer data niet beschikbaar');
-                
-                const data = await response.json();
-                const temp = data.current_weather.temperature;
-                const weatherCode = data.current_weather.weathercode;
-                
-                // Vertaal weer code naar emoji
-                let weatherEmoji = '🌡️';
-                if (weatherCode === 0) weatherEmoji = '☀️';
-                else if (weatherCode === 1 || weatherCode === 2) weatherEmoji = '⛅';
-                else if (weatherCode === 3) weatherEmoji = '☁️';
-                else if (weatherCode >= 45 && weatherCode <= 48) weatherEmoji = '🌫️';
-                else if (weatherCode >= 51 && weatherCode <= 67) weatherEmoji = '🌧️';
-                else if (weatherCode >= 71 && weatherCode <= 77) weatherEmoji = '❄️';
-                else if (weatherCode >= 80 && weatherCode <= 99) weatherEmoji = '⛈️';
-                
-                const weatherElement = document.getElementById('weather');
-                weatherElement.innerHTML = `
-                    <span class="weather-icon">${weatherEmoji}</span>
-                    <span class="weather-temp">${Math.round(temp)}°C</span>
-                    <span class="weather-location" id="weatherLocation">${getLocationName() || 'Huidige locatie'}</span>
-                `;
-            } catch (error) {
-                console.error('Weer fout:', error);
-                const weatherElement = document.getElementById('weather');
-                weatherElement.innerHTML = `
-                    <span class="weather-icon">⚠️</span>
-                    <span class="weather-error">Weer niet beschikbaar</span>
-                `;
-            }
-        }
-        
-        let currentLocationName = '';
-        
-        function getLocationName() {
-            return currentLocationName || 'Jouw locatie';
-        }
-        
-        async function getLocationAndWeather() {
-            const weatherContainer = document.getElementById('weather');
-            weatherContainer.innerHTML = `
-                <span class="weather-icon">📍</span>
-                <span class="weather-loading">Locatie ophalen</span>
-            `;
-            
-            if (!navigator.geolocation) {
-                weatherContainer.innerHTML = `
-                    <span class="weather-icon">⚠️</span>
-                    <span class="weather-error">Geolocatie niet ondersteund</span>
-                `;
-                return;
-            }
-            
-            navigator.geolocation.getCurrentPosition(
-                async (position) => {
-                    const { latitude, longitude } = position.coords;
-                    
-                    // Reverse geocoding voor locatienaam (gratis via OpenStreetMap Nominatim)
-                    try {
-                        const geoResponse = await fetch(
-                            `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json&accept-language=nl`
-                        );
-                        const geoData = await geoResponse.json();
-                        if (geoData.address) {
-                            const city = geoData.address.city || geoData.address.town || geoData.address.village || geoData.address.municipality;
-                            currentLocationName = city || 'Jouw locatie';
-                        } else {
-                            currentLocationName = 'Jouw locatie';
-                        }
-                    } catch (e) {
-                        currentLocationName = 'Jouw locatie';
-                    }
-                    
-                    await getWeather(latitude, longitude);
-                },
-                (error) => {
-                    console.error('Geolocatie fout:', error);
-                    let errorMsg = 'Locatie niet beschikbaar';
-                    if (error.code === 1) errorMsg = 'Toestemming geweigerd';
-                    else if (error.code === 2) errorMsg = 'Locatie onbekend';
-                    
-                    weatherContainer.innerHTML = `
-                        <span class="weather-icon">📍</span>
-                        <span class="weather-error">${errorMsg}</span>
-                    `;
-                }
-            );
-        }
-        
-        // Start weer ophalen
-        getLocationAndWeather();
-        
-        // Ververs weer elk half uur
-        setInterval(() => {
-            if (navigator.onLine) {
-                getLocationAndWeather();
-            }
-        }, 1800000);
-        
         // ===== OFFLINE DETECTIE =====
         const offlineToast = document.getElementById('offlineToast');
+        let wasOffline = false;
         
         function updateOfflineStatus() {
             if (!navigator.onLine) {
+                // Als we offline zijn, toon de melding
                 offlineToast.classList.add('show');
-            } else {
-                offlineToast.classList.remove('show');
+                wasOffline = true;
+            } else if (wasOffline) {
+                // Als we weer online komen EN we waren eerder offline, toon de melding kort
+                offlineToast.classList.add('show');
+                // Verander de tekst naar "Je bent weer online!"
+                const toastSpan = offlineToast.querySelector('span:last-child');
+                const originalText = toastSpan.textContent;
+                toastSpan.textContent = '✅ Je bent weer online!';
+                offlineToast.style.background = 'rgba(40, 167, 69, 0.95)';
+                
+                // Verberg de melding na 3 seconden
+                setTimeout(() => {
+                    offlineToast.classList.remove('show');
+                    // Reset de tekst en kleur voor de volgende keer
+                    toastSpan.textContent = originalText;
+                    offlineToast.style.background = 'rgba(220, 53, 69, 0.95)';
+                }, 3000);
+                
+                wasOffline = false;
             }
         }
         
@@ -995,14 +747,10 @@
         updateOfflineStatus();
         
         // Luister naar online/offline events
-        window.addEventListener('online', () => {
-            updateOfflineStatus();
-            // Ververs weer direct als we weer online komen
-            getLocationAndWeather();
-        });
+        window.addEventListener('online', updateOfflineStatus);
         window.addEventListener('offline', updateOfflineStatus);
         
-        // Klik op offline melding om te sluiten
+        // Klik op offline melding om te sluiten (alleen als het de offline melding is, niet de online melding)
         offlineToast.addEventListener('click', () => {
             offlineToast.classList.remove('show');
         });
@@ -1017,8 +765,7 @@
         
         // Zoekmachine instellingen
         let zoekmachine = {
-            type: 'google',
-            customUrl: ''
+            type: 'google'
         };
 
         // Zoekmachine URLs
@@ -1026,9 +773,7 @@
             google: 'https://www.google.com/search?q={q}',
             bing: 'https://www.bing.com/search?q={q}',
             duckduckgo: 'https://duckduckgo.com/?q={q}',
-            yahoo: 'https://search.yahoo.com/search?p={q}',
-            baidu: 'https://www.baidu.com/s?wd={q}',
-            yandex: 'https://yandex.com/search/?text={q}'
+            yahoo: 'https://search.yahoo.com/search?p={q}'
         };
 
         // Lijst van mogelijke afbeelding extensies
@@ -1042,12 +787,8 @@
                     const instellingen = JSON.parse(opgeslagen);
                     zoekmachine = instellingen;
                     
-                    if (zoekmachine.type !== 'custom') {
-                        const radio = document.querySelector(`input[name="zoekmachine"][value="${zoekmachine.type}"]`);
-                        if (radio) radio.checked = true;
-                    }
-                    
-                    document.getElementById('customEngineUrl').value = zoekmachine.customUrl || '';
+                    const radio = document.querySelector(`input[name="zoekmachine"][value="${zoekmachine.type}"]`);
+                    if (radio) radio.checked = true;
                 } catch (e) {
                     console.error('Fout bij laden instellingen:', e);
                 }
@@ -1070,14 +811,8 @@
                 return;
             }
             
-            let searchUrl;
-            if (zoekmachine.type === 'custom' && zoekmachine.customUrl) {
-                searchUrl = zoekmachine.customUrl.replace('{q}', encodeURIComponent(query));
-            } else {
-                const baseUrl = zoekmachineUrls[zoekmachine.type] || zoekmachineUrls.google;
-                searchUrl = baseUrl.replace('{q}', encodeURIComponent(query));
-            }
-            
+            const baseUrl = zoekmachineUrls[zoekmachine.type] || zoekmachineUrls.google;
+            const searchUrl = baseUrl.replace('{q}', encodeURIComponent(query));
             window.location.href = searchUrl;
         }
 
@@ -1250,20 +985,9 @@
                 radio.addEventListener('change', (e) => {
                     if (e.target.checked) {
                         zoekmachine.type = e.target.value;
-                        zoekmachine.customUrl = '';
                         opslaanInstellingen();
                     }
                 });
-            });
-            
-            document.getElementById('customEngineOpslaan').addEventListener('click', () => {
-                const customUrl = document.getElementById('customEngineUrl').value.trim();
-                if (customUrl) {
-                    zoekmachine.type = 'custom';
-                    zoekmachine.customUrl = customUrl;
-                    opslaanInstellingen();
-                    radioButtons.forEach(radio => radio.checked = false);
-                }
             });
             
             zoekveld.addEventListener('input', (e) => {
