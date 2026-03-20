@@ -6,6 +6,7 @@
     <title>Zoekmachine</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap');
 
         * {
             margin: 0;
@@ -32,11 +33,10 @@
         /* Donker thema - op basis van systeem voorkeur */
         @media (prefers-color-scheme: dark) {
             body {
-                background-color: #0a0a0a; /* Donkerder dan voorheen */
+                background-color: #0a0a0a;
                 color: #ffffff;
             }
             
-            /* Fade-in vanaf zwart voor donker thema */
             .background-image {
                 opacity: 0;
                 transition: opacity 1.5s ease-in-out;
@@ -82,11 +82,148 @@
             opacity: 1;
         }
 
+        /* ===== NIEUWE STIJLEN VOOR KLOK, WEER EN OFFLINE MELDING ===== */
+        
+        /* Linksonder - Klok */
+        .clock-container {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 100;
+            font-family: 'Space Mono', monospace;
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            padding: 12px 24px;
+            border-radius: 60px;
+            color: white;
+            letter-spacing: 2px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        @media (prefers-color-scheme: dark) {
+            .clock-container {
+                background: rgba(0, 0, 0, 0.7);
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            }
+        }
+        
+        /* Weer widget - linksonder naast/onder de klok */
+        .weather-container {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            transform: translateY(80px);
+            z-index: 100;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            padding: 10px 20px;
+            border-radius: 50px;
+            color: white;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        @media (min-width: 768px) {
+            .weather-container {
+                transform: translateY(90px);
+            }
+        }
+        
+        .weather-icon {
+            font-size: 1.4rem;
+        }
+        
+        .weather-temp {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
+        .weather-location {
+            font-size: 0.8rem;
+            opacity: 0.9;
+            max-width: 150px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .weather-error {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+        
+        /* Offline melding - rechtsboven */
+        .offline-toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 100;
+            background: rgba(220, 53, 69, 0.95);
+            backdrop-filter: blur(10px);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 500;
+            font-size: 0.9rem;
+            display: none;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            animation: slideInRight 0.3s ease-out;
+            cursor: pointer;
+            transition: opacity 0.3s ease;
+        }
+        
+        .offline-toast.show {
+            display: flex;
+        }
+        
+        .offline-toast:hover {
+            background: rgba(200, 35, 51, 0.95);
+        }
+        
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        /* Laad indicator voor weer */
+        .weather-loading {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .weather-loading::after {
+            content: "...";
+            animation: dots 1.5s steps(4, end) infinite;
+        }
+        
+        @keyframes dots {
+            0%, 20% { content: "."; }
+            40% { content: ".."; }
+            60%, 100% { content: "..."; }
+        }
+        
         .zoek-container {
             width: 100%;
             max-width: 600px;
             padding: 20px 20px 20px 20px;
-            margin-top: 20px; /* Verkleind van 60px naar 20px */
+            margin-top: 20px;
             position: relative;
             z-index: 1;
         }
@@ -109,17 +246,15 @@
             letter-spacing: 0.3px;
         }
 
-        /* Licht thema zoekbalk */
         .zoekbalk {
             background: rgba(255, 255, 255, 0.9);
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
             color: #1a1a1a;
         }
 
-        /* Donker thema zoekbalk */
         @media (prefers-color-scheme: dark) {
             .zoekbalk {
-                background: rgba(20, 20, 20, 0.95); /* Donkerder */
+                background: rgba(20, 20, 20, 0.95);
                 box-shadow: 0 4px 20px rgba(0, 0, 0, 0.8);
                 color: #ffffff;
             }
@@ -156,17 +291,16 @@
             height: 48px;
             border: none;
             border-radius: 50%;
-            background: transparent; /* Transparante achtergrond */
+            background: transparent;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             transition: all 0.3s ease;
-            font-size: 0; /* Verberg tekst */
+            font-size: 0;
             padding: 8px;
         }
 
-        /* Zoekknop afbeelding - basis stijl (voor licht thema) */
         .zoek-knop::before {
             content: "";
             display: block;
@@ -179,7 +313,6 @@
             transition: all 0.3s ease;
         }
 
-        /* Donker thema - wit vergrootglas */
         @media (prefers-color-scheme: dark) {
             .zoek-knop::before {
                 background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>');
@@ -219,13 +352,11 @@
             z-index: 100;
         }
 
-        /* Licht thema instellingen knop */
         .instellingen-knop {
             background: rgba(0, 0, 0, 0.5);
             color: white;
         }
 
-        /* Donker thema instellingen knop */
         @media (prefers-color-scheme: dark) {
             .instellingen-knop {
                 background: rgba(255, 255, 255, 0.2);
@@ -258,16 +389,14 @@
             transition: all 0.3s ease;
         }
 
-        /* Licht thema menu */
         .instellingen-menu {
             background: rgba(255, 255, 255, 0.95);
             color: #1a1a1a;
         }
 
-        /* Donker thema menu */
         @media (prefers-color-scheme: dark) {
             .instellingen-menu {
-                background: rgba(20, 20, 20, 0.98); /* Donkerder */
+                background: rgba(20, 20, 20, 0.98);
                 color: #ffffff;
             }
             
@@ -316,7 +445,6 @@
             border: 2px solid transparent;
         }
 
-        /* Licht thema opties */
         .zoekmachine-optie {
             background: #f5f5f5;
         }
@@ -330,7 +458,6 @@
             background: #e3f2fd;
         }
 
-        /* Donker thema opties */
         @media (prefers-color-scheme: dark) {
             .zoekmachine-optie {
                 background: #2a2a2a;
@@ -384,7 +511,6 @@
             transition: all 0.2s ease;
         }
 
-        /* Donker thema custom input */
         @media (prefers-color-scheme: dark) {
             .custom-zoekmachine input {
                 background: #2a2a2a;
@@ -434,7 +560,6 @@
             transition: all 0.2s ease;
         }
 
-        /* Licht thema sluit knop */
         .menu-sluiten {
             background: #f0f0f0;
             color: #666;
@@ -445,7 +570,6 @@
             color: #333;
         }
 
-        /* Donker thema sluit knop */
         @media (prefers-color-scheme: dark) {
             .menu-sluiten {
                 background: #333;
@@ -489,7 +613,6 @@
             animation: slideDown 0.3s ease-out;
         }
 
-        /* Licht thema suggesties */
         .suggesties {
             background: rgba(255, 255, 255, 0.95);
         }
@@ -502,7 +625,6 @@
             margin: 2px 0;
         }
 
-        /* Licht thema suggestie items */
         .suggesties li {
             color: #1a1a1a;
         }
@@ -512,10 +634,9 @@
             transform: translateX(5px);
         }
 
-        /* Donker thema suggesties */
         @media (prefers-color-scheme: dark) {
             .suggesties {
-                background: rgba(20, 20, 20, 0.98); /* Donkerder */
+                background: rgba(20, 20, 20, 0.98);
                 border-color: rgba(255, 255, 255, 0.1);
             }
             
@@ -561,13 +682,11 @@
             animation: fadeIn 0.3s ease-out;
         }
 
-        /* Licht thema loading */
         .loading {
             background: rgba(0, 0, 0, 0.5);
             color: white;
         }
 
-        /* Donker thema loading */
         @media (prefers-color-scheme: dark) {
             .loading {
                 background: rgba(255, 255, 255, 0.2);
@@ -584,7 +703,6 @@
             }
         }
 
-        /* Scrollbar styling */
         .suggesties::-webkit-scrollbar {
             width: 8px;
         }
@@ -603,7 +721,6 @@
             background: #555;
         }
 
-        /* Donker thema scrollbar */
         @media (prefers-color-scheme: dark) {
             .suggesties::-webkit-scrollbar-track {
                 background: #2a2a2a;
@@ -628,12 +745,57 @@
                 color: #aaa !important;
             }
         }
+        
+        /* Responsive aanpassingen */
+        @media (max-width: 600px) {
+            .clock-container {
+                font-size: 1.5rem;
+                padding: 8px 16px;
+                bottom: 10px;
+                left: 10px;
+            }
+            
+            .weather-container {
+                bottom: 10px;
+                left: 10px;
+                transform: translateY(60px);
+                padding: 6px 12px;
+                font-size: 0.75rem;
+            }
+            
+            .weather-location {
+                max-width: 120px;
+            }
+            
+            .offline-toast {
+                top: 10px;
+                right: 10px;
+                padding: 8px 16px;
+                font-size: 0.8rem;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="background-container">
         <div id="bg1" class="background-image"></div>
         <div id="bg2" class="background-image"></div>
+    </div>
+
+    <!-- Klok widget -->
+    <div class="clock-container" id="clock">--:--</div>
+    
+    <!-- Weer widget -->
+    <div class="weather-container" id="weather">
+        <span class="weather-icon">🌡️</span>
+        <span class="weather-temp" id="weatherTemp">--°C</span>
+        <span class="weather-location" id="weatherLocation">Locatie laden...</span>
+    </div>
+    
+    <!-- Offline melding -->
+    <div class="offline-toast" id="offlineToast">
+        <span>⚠️</span>
+        <span>Whoops... je bent offline</span>
     </div>
 
     <div class="zoek-container">
@@ -699,6 +861,154 @@
     </div>
 
     <script>
+        // ===== KLOK FUNCTIE =====
+        function updateClock() {
+            const now = new Date();
+            const hours = now.getHours().toString().padStart(2, '0');
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            document.getElementById('clock').textContent = `${hours}:${minutes}`;
+        }
+        updateClock();
+        setInterval(updateClock, 1000);
+        
+        // ===== WEER FUNCTIE =====
+        let weatherInterval = null;
+        
+        async function getWeather(lat, lon) {
+            try {
+                // Gebruik Open-Meteo API (gratis, geen API key nodig)
+                const response = await fetch(
+                    `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&timezone=auto`
+                );
+                
+                if (!response.ok) throw new Error('Weer data niet beschikbaar');
+                
+                const data = await response.json();
+                const temp = data.current_weather.temperature;
+                const weatherCode = data.current_weather.weathercode;
+                
+                // Vertaal weer code naar emoji
+                let weatherEmoji = '🌡️';
+                if (weatherCode === 0) weatherEmoji = '☀️';
+                else if (weatherCode === 1 || weatherCode === 2) weatherEmoji = '⛅';
+                else if (weatherCode === 3) weatherEmoji = '☁️';
+                else if (weatherCode >= 45 && weatherCode <= 48) weatherEmoji = '🌫️';
+                else if (weatherCode >= 51 && weatherCode <= 67) weatherEmoji = '🌧️';
+                else if (weatherCode >= 71 && weatherCode <= 77) weatherEmoji = '❄️';
+                else if (weatherCode >= 80 && weatherCode <= 99) weatherEmoji = '⛈️';
+                
+                const weatherElement = document.getElementById('weather');
+                weatherElement.innerHTML = `
+                    <span class="weather-icon">${weatherEmoji}</span>
+                    <span class="weather-temp">${Math.round(temp)}°C</span>
+                    <span class="weather-location" id="weatherLocation">${getLocationName() || 'Huidige locatie'}</span>
+                `;
+            } catch (error) {
+                console.error('Weer fout:', error);
+                const weatherElement = document.getElementById('weather');
+                weatherElement.innerHTML = `
+                    <span class="weather-icon">⚠️</span>
+                    <span class="weather-error">Weer niet beschikbaar</span>
+                `;
+            }
+        }
+        
+        let currentLocationName = '';
+        
+        function getLocationName() {
+            return currentLocationName || 'Jouw locatie';
+        }
+        
+        async function getLocationAndWeather() {
+            const weatherContainer = document.getElementById('weather');
+            weatherContainer.innerHTML = `
+                <span class="weather-icon">📍</span>
+                <span class="weather-loading">Locatie ophalen</span>
+            `;
+            
+            if (!navigator.geolocation) {
+                weatherContainer.innerHTML = `
+                    <span class="weather-icon">⚠️</span>
+                    <span class="weather-error">Geolocatie niet ondersteund</span>
+                `;
+                return;
+            }
+            
+            navigator.geolocation.getCurrentPosition(
+                async (position) => {
+                    const { latitude, longitude } = position.coords;
+                    
+                    // Reverse geocoding voor locatienaam (gratis via OpenStreetMap Nominatim)
+                    try {
+                        const geoResponse = await fetch(
+                            `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json&accept-language=nl`
+                        );
+                        const geoData = await geoResponse.json();
+                        if (geoData.address) {
+                            const city = geoData.address.city || geoData.address.town || geoData.address.village || geoData.address.municipality;
+                            currentLocationName = city || 'Jouw locatie';
+                        } else {
+                            currentLocationName = 'Jouw locatie';
+                        }
+                    } catch (e) {
+                        currentLocationName = 'Jouw locatie';
+                    }
+                    
+                    await getWeather(latitude, longitude);
+                },
+                (error) => {
+                    console.error('Geolocatie fout:', error);
+                    let errorMsg = 'Locatie niet beschikbaar';
+                    if (error.code === 1) errorMsg = 'Toestemming geweigerd';
+                    else if (error.code === 2) errorMsg = 'Locatie onbekend';
+                    
+                    weatherContainer.innerHTML = `
+                        <span class="weather-icon">📍</span>
+                        <span class="weather-error">${errorMsg}</span>
+                    `;
+                }
+            );
+        }
+        
+        // Start weer ophalen
+        getLocationAndWeather();
+        
+        // Ververs weer elk half uur
+        setInterval(() => {
+            if (navigator.onLine) {
+                getLocationAndWeather();
+            }
+        }, 1800000);
+        
+        // ===== OFFLINE DETECTIE =====
+        const offlineToast = document.getElementById('offlineToast');
+        
+        function updateOfflineStatus() {
+            if (!navigator.onLine) {
+                offlineToast.classList.add('show');
+            } else {
+                offlineToast.classList.remove('show');
+            }
+        }
+        
+        // Controleer bij laden
+        updateOfflineStatus();
+        
+        // Luister naar online/offline events
+        window.addEventListener('online', () => {
+            updateOfflineStatus();
+            // Ververs weer direct als we weer online komen
+            getLocationAndWeather();
+        });
+        window.addEventListener('offline', updateOfflineStatus);
+        
+        // Klik op offline melding om te sluiten
+        offlineToast.addEventListener('click', () => {
+            offlineToast.classList.remove('show');
+        });
+        
+        // ===== BESTAANDE CODE VOOR ZOEKMACHINE, SUGGESTIES EN ACHTERGROND =====
+        
         // Data structuur voor suggesties
         let suggesties = [];
         let huidigeAchtergrond = 0;
@@ -732,13 +1042,11 @@
                     const instellingen = JSON.parse(opgeslagen);
                     zoekmachine = instellingen;
                     
-                    // Update radio button
                     if (zoekmachine.type !== 'custom') {
                         const radio = document.querySelector(`input[name="zoekmachine"][value="${zoekmachine.type}"]`);
                         if (radio) radio.checked = true;
                     }
                     
-                    // Update custom URL veld
                     document.getElementById('customEngineUrl').value = zoekmachine.customUrl || '';
                 } catch (e) {
                     console.error('Fout bij laden instellingen:', e);
@@ -746,16 +1054,13 @@
             }
         }
 
-        // Sla instellingen op
         function opslaanInstellingen() {
             localStorage.setItem('zoekmachineInstellingen', JSON.stringify(zoekmachine));
         }
 
-        // Functie om zoekopdracht uit te voeren met gekozen zoekmachine
         function voerZoekopdrachtUit(query) {
             if (!query) return;
             
-            // Eerst controleren op exacte match met suggestie die URL heeft
             const exacteMatch = suggesties.find(s => 
                 s.tekst.toLowerCase() === query.toLowerCase() && s.url
             );
@@ -765,9 +1070,7 @@
                 return;
             }
             
-            // Anders gebruiken we de gekozen zoekmachine
             let searchUrl;
-            
             if (zoekmachine.type === 'custom' && zoekmachine.customUrl) {
                 searchUrl = zoekmachine.customUrl.replace('{q}', encodeURIComponent(query));
             } else {
@@ -778,7 +1081,6 @@
             window.location.href = searchUrl;
         }
 
-        // Functie om ervoor te zorgen dat URL correct wordt geopend
         function openURL(url) {
             if (url && !url.match(/^https?:\/\//i)) {
                 url = 'https://' + url;
@@ -786,7 +1088,6 @@
             window.location.href = url;
         }
 
-        // Menu openen/sluiten functies
         function openMenu() {
             document.getElementById('instellingenMenu').classList.add('active');
             document.getElementById('overlay').classList.add('active');
@@ -797,222 +1098,133 @@
             document.getElementById('overlay').classList.remove('active');
         }
 
-        // Functie om te controleren of een afbeelding bestaat (met meerdere extensies)
         async function vindAfbeelding(basisNaam) {
             for (const ext of afbeeldingExtensies) {
                 const url = basisNaam + ext;
                 try {
                     const response = await fetch(url, { method: 'HEAD' });
                     if (response.ok) {
-                        console.log(`Afbeelding gevonden: ${url}`);
                         return url;
                     }
-                } catch (e) {
-                    // Negeer fouten
-                }
+                } catch (e) {}
             }
             return null;
         }
 
-        // Random achtergrond kiezen (1-10)
         function kiesRandomAchtergrond() {
             return Math.floor(Math.random() * totaalAchtergronden) + 1;
         }
 
-        // Achtergrond instellen met animatie
         async function wisselAchtergrond() {
-            if (isAanHetWisselen) {
-                console.log('Bezig met wisselen...');
-                return;
-            }
-            
+            if (isAanHetWisselen) return;
             isAanHetWisselen = true;
-            console.log('Start achtergrond wissel...');
             
             let nieuwNummer;
             do {
                 nieuwNummer = kiesRandomAchtergrond();
             } while (nieuwNummer === huidigeAchtergrond && totaalAchtergronden > 1);
             
-            console.log('Nieuwe achtergrond nummer:', nieuwNummer);
-            
-            // Zoek afbeelding met mogelijke extensies
             const afbeeldingUrl = await vindAfbeelding(`${nieuwNummer}`);
             
             if (afbeeldingUrl) {
                 const bg1 = document.getElementById('bg1');
                 const bg2 = document.getElementById('bg2');
-                
                 const isBg1Active = bg1.classList.contains('active');
-                console.log('Bg1 actief:', isBg1Active);
                 
                 if (isBg1Active) {
                     bg2.style.backgroundImage = `url('${afbeeldingUrl}')`;
                     bg2.classList.add('active');
                     bg1.classList.remove('active');
-                    console.log('Bg2 geactiveerd met:', afbeeldingUrl);
                 } else {
                     bg1.style.backgroundImage = `url('${afbeeldingUrl}')`;
                     bg1.classList.add('active');
                     bg2.classList.remove('active');
-                    console.log('Bg1 geactiveerd met:', afbeeldingUrl);
                 }
-                
                 huidigeAchtergrond = nieuwNummer;
-                console.log('Nieuwe achtergrond ingesteld:', huidigeAchtergrond);
-            } else {
-                console.log(`Geen afbeelding gevonden voor nummer ${nieuwNummer}`);
             }
-            
             isAanHetWisselen = false;
-            console.log('Wissel voltooid');
         }
 
-        // Start achtergrond rotatie
         function startAchtergrondRotatie() {
-            console.log('Start achtergrond rotatie...');
-            
-            // Eerste achtergrond instellen
             setTimeout(async () => {
-                console.log('Eerste achtergrond zoeken...');
-                let gevonden = false;
-                
                 for (let i = 1; i <= totaalAchtergronden; i++) {
                     const afbeeldingUrl = await vindAfbeelding(`${i}`);
                     if (afbeeldingUrl) {
-                        console.log('Eerste achtergrond gevonden:', i, afbeeldingUrl);
                         document.getElementById('bg1').style.backgroundImage = `url('${afbeeldingUrl}')`;
                         document.getElementById('bg1').classList.add('active');
                         huidigeAchtergrond = i;
-                        gevonden = true;
                         break;
                     }
                 }
-                
-                if (!gevonden) {
-                    console.log('Geen achtergrondafbeeldingen gevonden');
-                    document.getElementById('error').style.display = 'block';
-                    document.getElementById('error').textContent = 'Geen achtergrondafbeeldingen gevonden (zoek naar 1.png, 1.jpg, etc.)';
-                } else {
-                    console.log('Achtergrond succesvol geladen, start interval...');
-                    // Start interval voor wisselen
-                    setInterval(async () => {
-                        console.log('10 seconden interval - wissel achtergrond');
-                        await wisselAchtergrond();
-                    }, 10000);
-                }
+                setInterval(() => wisselAchtergrond(), 10000);
             }, 500);
         }
 
-        // Laad suggesties uit het txt bestand
         async function laadSuggesties() {
             const loading = document.getElementById('loading');
             const error = document.getElementById('error');
             
             try {
                 loading.style.display = 'block';
-                error.style.display = 'none';
-                
-                console.log('Suggesties laden...');
                 const response = await fetch('zoeksuggesties.txt');
-                
-                if (!response.ok) {
-                    throw new Error(`Kan zoeksuggesties.txt niet laden`);
-                }
+                if (!response.ok) throw new Error('Kan zoeksuggesties.txt niet laden');
                 
                 const text = await response.text();
                 const regels = text.trim().split('\n');
                 
                 suggesties = regels.map(regel => {
                     if (!regel.trim()) return null;
-                    
                     const eersteGelijkteken = regel.indexOf('=');
-                    
                     if (eersteGelijkteken !== -1) {
                         const tekst = regel.substring(0, eersteGelijkteken).trim();
                         let url = regel.substring(eersteGelijkteken + 1).trim();
-                        
-                        if (url && !url.match(/^https?:\/\//i)) {
-                            url = 'https://' + url;
-                        }
-                        
-                        return {
-                            tekst: tekst,
-                            url: url || null
-                        };
+                        if (url && !url.match(/^https?:\/\//i)) url = 'https://' + url;
+                        return { tekst, url };
                     } else {
-                        return {
-                            tekst: regel.trim(),
-                            url: null
-                        };
+                        return { tekst: regel.trim(), url: null };
                     }
                 }).filter(s => s !== null);
                 
-                console.log(`${suggesties.length} suggesties geladen`);
                 loading.style.display = 'none';
-                
             } catch (err) {
                 loading.style.display = 'none';
                 error.style.display = 'block';
                 error.textContent = `Fout: ${err.message}`;
-                console.error('Fout:', err);
             }
         }
 
-        // Zoek suggesties op basis van input (maximaal 10)
         function zoekSuggesties(input) {
             if (!input || suggesties.length === 0) return [];
             input = input.toLowerCase();
-            
-            const gevonden = suggesties.filter(s => 
-                s.tekst.toLowerCase().includes(input)
-            );
-            
-            return gevonden.slice(0, 10);
+            return suggesties.filter(s => s.tekst.toLowerCase().includes(input)).slice(0, 10);
         }
 
-        // Toon suggesties in de UI
         function toonSuggesties(suggestieLijst) {
             const lijst = document.getElementById('suggesties-lijst');
-            
             if (suggestieLijst.length === 0) {
                 lijst.style.display = 'none';
                 return;
             }
-            
             lijst.innerHTML = '';
             suggestieLijst.forEach(suggestie => {
                 const li = document.createElement('li');
                 li.textContent = suggestie.tekst + (suggestie.url ? ' →' : '');
-                li.onclick = () => selecteerSuggestie(suggestie);
+                li.onclick = () => {
+                    document.getElementById('zoekveld').value = suggestie.tekst;
+                    if (suggestie.url) openURL(suggestie.url);
+                    else voerZoekopdrachtUit(suggestie.tekst);
+                    lijst.style.display = 'none';
+                };
                 lijst.appendChild(li);
             });
-            
             lijst.style.display = 'block';
-        }
-
-        // Verwerk geselecteerde suggestie
-        function selecteerSuggestie(suggestie) {
-            const zoekveld = document.getElementById('zoekveld');
-            zoekveld.value = suggestie.tekst;
-            
-            if (suggestie.url) {
-                openURL(suggestie.url);
-            } else {
-                document.getElementById('suggesties-lijst').style.display = 'none';
-                voerZoekopdrachtUit(suggestie.tekst);
-            }
         }
 
         // Event listeners
         document.addEventListener('DOMContentLoaded', () => {
-            console.log('DOM geladen, start applicatie...');
-            
             laadInstellingen();
-            laadSuggesties().then(() => {
-                console.log('Suggesties geladen, start achtergrond...');
-                startAchtergrondRotatie();
-            });
+            laadSuggesties();
+            startAchtergrondRotatie();
             
             const zoekveld = document.getElementById('zoekveld');
             const suggestiesLijst = document.getElementById('suggesties-lijst');
@@ -1021,24 +1233,18 @@
             const menuSluiten = document.getElementById('menuSluiten');
             const overlay = document.getElementById('overlay');
             
-            // Ctrl+I shortcut
             document.addEventListener('keydown', (e) => {
                 if (e.ctrlKey && e.key === 'i') {
                     e.preventDefault();
-                    if (document.getElementById('instellingenMenu').classList.contains('active')) {
-                        sluitMenu();
-                    } else {
-                        openMenu();
-                    }
+                    if (document.getElementById('instellingenMenu').classList.contains('active')) sluitMenu();
+                    else openMenu();
                 }
             });
             
-            // Menu openen/sluiten
             instellingenKnop.addEventListener('click', openMenu);
             menuSluiten.addEventListener('click', sluitMenu);
             overlay.addEventListener('click', sluitMenu);
             
-            // Zoekmachine keuze
             const radioButtons = document.querySelectorAll('input[name="zoekmachine"]');
             radioButtons.forEach(radio => {
                 radio.addEventListener('change', (e) => {
@@ -1050,35 +1256,23 @@
                 });
             });
             
-            // Custom zoekmachine opslaan
             document.getElementById('customEngineOpslaan').addEventListener('click', () => {
                 const customUrl = document.getElementById('customEngineUrl').value.trim();
                 if (customUrl) {
                     zoekmachine.type = 'custom';
                     zoekmachine.customUrl = customUrl;
                     opslaanInstellingen();
-                    
-                    // Deselecteer radio buttons
-                    radioButtons.forEach(radio => {
-                        radio.checked = false;
-                    });
+                    radioButtons.forEach(radio => radio.checked = false);
                 }
             });
             
             zoekveld.addEventListener('input', (e) => {
-                const input = e.target.value;
-                const gevondenSuggesties = zoekSuggesties(input);
-                toonSuggesties(gevondenSuggesties);
+                toonSuggesties(zoekSuggesties(e.target.value));
             });
             
-            zoekKnop.addEventListener('click', () => {
-                voerZoekopdrachtUit(zoekveld.value);
-            });
-            
+            zoekKnop.addEventListener('click', () => voerZoekopdrachtUit(zoekveld.value));
             zoekveld.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    voerZoekopdrachtUit(zoekveld.value);
-                }
+                if (e.key === 'Enter') voerZoekopdrachtUit(zoekveld.value);
             });
             
             document.addEventListener('click', (e) => {
@@ -1089,8 +1283,7 @@
             
             zoekveld.addEventListener('focus', () => {
                 if (zoekveld.value && suggesties.length > 0) {
-                    const gevondenSuggesties = zoekSuggesties(zoekveld.value);
-                    toonSuggesties(gevondenSuggesties);
+                    toonSuggesties(zoekSuggesties(zoekveld.value));
                 }
             });
         });
