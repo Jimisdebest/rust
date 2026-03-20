@@ -24,13 +24,11 @@
             transition: background-color 0.3s ease, color 0.3s ease;
         }
 
-        /* Licht thema (default) */
         body {
             background-color: #f5f5f5;
             color: #1a1a1a;
         }
 
-        /* Donker thema - op basis van systeem voorkeur */
         @media (prefers-color-scheme: dark) {
             body {
                 background-color: #0a0a0a;
@@ -55,7 +53,6 @@
             }
         }
 
-        /* Achtergrond container voor animaties */
         .background-container {
             position: fixed;
             top: 0;
@@ -82,7 +79,7 @@
             opacity: 1;
         }
 
-        /* Linksonder - Klok */
+        /* Klok */
         .clock-container {
             position: fixed;
             bottom: 20px;
@@ -98,17 +95,74 @@
             color: white;
             letter-spacing: 2px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-            transition: all 0.3s ease;
         }
         
         @media (prefers-color-scheme: dark) {
             .clock-container {
                 background: rgba(0, 0, 0, 0.7);
-                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            }
+        }
+
+        /* Welkomstbericht */
+        .welcome-container {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 100;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            padding: 12px 24px;
+            border-radius: 60px;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 500;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Feitjes widget - midden onderaan */
+        .facts-container {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(10px);
+            padding: 12px 24px;
+            border-radius: 60px;
+            color: white;
+            font-size: 0.9rem;
+            text-align: center;
+            max-width: 80vw;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+        }
+        
+        .facts-container:hover {
+            background: rgba(0, 0, 0, 0.8);
+            transform: translateX(-50%) scale(1.02);
+        }
+        
+        @media (max-width: 768px) {
+            .facts-container {
+                font-size: 0.75rem;
+                padding: 8px 16px;
+                white-space: normal;
+                max-width: 90vw;
+                text-align: center;
+                line-height: 1.3;
             }
         }
         
-        /* Offline melding - rechtsboven */
+        .facts-container.hidden {
+            display: none;
+        }
+        
+        /* Offline melding */
         .offline-toast {
             position: fixed;
             top: 20px;
@@ -128,15 +182,10 @@
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
             animation: slideInRight 0.3s ease-out;
             cursor: pointer;
-            transition: opacity 0.3s ease;
         }
         
         .offline-toast.show {
             display: flex;
-        }
-        
-        .offline-toast:hover {
-            background: rgba(200, 35, 51, 0.95);
         }
         
         @keyframes slideInRight {
@@ -150,11 +199,12 @@
             }
         }
         
+        /* Zoekcontainer */
         .zoek-container {
             width: 100%;
             max-width: 600px;
-            padding: 20px 20px 20px 20px;
-            margin-top: 20px;
+            padding: 20px;
+            margin-top: 80px;
             position: relative;
             z-index: 1;
         }
@@ -173,11 +223,6 @@
             border: none;
             border-radius: 50px;
             transition: all 0.3s ease;
-            color: inherit;
-            letter-spacing: 0.3px;
-        }
-
-        .zoekbalk {
             background: rgba(255, 255, 255, 0.9);
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
             color: #1a1a1a;
@@ -189,7 +234,6 @@
                 box-shadow: 0 4px 20px rgba(0, 0, 0, 0.8);
                 color: #ffffff;
             }
-            
             .zoekbalk::placeholder {
                 color: #aaa;
             }
@@ -204,13 +248,7 @@
         @media (prefers-color-scheme: dark) {
             .zoekbalk:focus {
                 background: rgba(30, 30, 30, 1);
-                box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
             }
-        }
-
-        .zoekbalk::placeholder {
-            color: #666;
-            font-weight: 300;
         }
 
         .zoek-knop {
@@ -228,7 +266,6 @@
             align-items: center;
             justify-content: center;
             transition: all 0.3s ease;
-            font-size: 0;
             padding: 8px;
         }
 
@@ -236,7 +273,6 @@
             width: 100%;
             height: 100%;
             object-fit: contain;
-            transition: all 0.3s ease;
         }
 
         .zoek-knop:hover {
@@ -250,10 +286,7 @@
             }
         }
 
-        .zoek-knop:active {
-            transform: translateY(-50%) scale(0.95);
-        }
-
+        /* Instellingen */
         .instellingen-knop {
             position: fixed;
             bottom: 20px;
@@ -266,13 +299,9 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.3s ease;
             font-size: 24px;
             backdrop-filter: blur(5px);
             z-index: 100;
-        }
-
-        .instellingen-knop {
             background: rgba(0, 0, 0, 0.5);
             color: white;
         }
@@ -280,9 +309,7 @@
         @media (prefers-color-scheme: dark) {
             .instellingen-knop {
                 background: rgba(255, 255, 255, 0.2);
-                color: white;
             }
-            
             .instellingen-knop:hover {
                 background: rgba(255, 255, 255, 0.3);
             }
@@ -307,9 +334,6 @@
             opacity: 0;
             visibility: hidden;
             transition: all 0.3s ease;
-        }
-
-        .instellingen-menu {
             background: rgba(255, 255, 255, 0.95);
             color: #1a1a1a;
         }
@@ -318,15 +342,6 @@
             .instellingen-menu {
                 background: rgba(20, 20, 20, 0.98);
                 color: #ffffff;
-            }
-            
-            .instellingen-menu h2,
-            .instellingen-menu h3 {
-                color: #ffffff;
-            }
-            
-            .instellingen-menu h3 {
-                color: #ccc;
             }
         }
 
@@ -348,6 +363,65 @@
             font-size: 16px;
         }
 
+        .setting-toggle {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .setting-toggle {
+                border-bottom-color: rgba(255,255,255,0.1);
+            }
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 52px;
+            height: 28px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: 0.3s;
+            border-radius: 34px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.3s;
+            border-radius: 50%;
+        }
+
+        input:checked + .toggle-slider {
+            background-color: #007bff;
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(24px);
+        }
+
         .zoekmachine-opties {
             display: flex;
             flex-direction: column;
@@ -363,10 +437,16 @@
             cursor: pointer;
             transition: all 0.2s ease;
             border: 2px solid transparent;
+            background: #f5f5f5;
         }
 
-        .zoekmachine-optie {
-            background: #f5f5f5;
+        @media (prefers-color-scheme: dark) {
+            .zoekmachine-optie {
+                background: #2a2a2a;
+            }
+            .zoekmachine-optie:hover {
+                background: #3a3a3a;
+            }
         }
 
         .zoekmachine-optie:hover {
@@ -376,26 +456,6 @@
         .zoekmachine-optie.selected {
             border-color: #007bff;
             background: #e3f2fd;
-        }
-
-        @media (prefers-color-scheme: dark) {
-            .zoekmachine-optie {
-                background: #2a2a2a;
-                color: #ffffff;
-            }
-            
-            .zoekmachine-optie:hover {
-                background: #3a3a3a;
-            }
-            
-            .zoekmachine-optie.selected {
-                border-color: #007bff;
-                background: #1a3a5a;
-            }
-            
-            .zoekmachine-optie .url {
-                color: #aaa;
-            }
         }
 
         .zoekmachine-optie input[type="radio"] {
@@ -409,12 +469,6 @@
             font-weight: 500;
         }
 
-        .zoekmachine-optie .url {
-            color: #666;
-            font-size: 12px;
-            margin-left: 10px;
-        }
-
         .menu-sluiten {
             position: absolute;
             top: 15px;
@@ -424,32 +478,15 @@
             border: none;
             border-radius: 50%;
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             font-size: 20px;
-            transition: all 0.2s ease;
-        }
-
-        .menu-sluiten {
             background: #f0f0f0;
             color: #666;
-        }
-
-        .menu-sluiten:hover {
-            background: #e0e0e0;
-            color: #333;
         }
 
         @media (prefers-color-scheme: dark) {
             .menu-sluiten {
                 background: #333;
                 color: #ccc;
-            }
-            
-            .menu-sluiten:hover {
-                background: #444;
-                color: #fff;
             }
         }
 
@@ -480,12 +517,19 @@
             max-height: 400px;
             overflow-y: auto;
             display: none;
-            border: 1px solid rgba(0, 0, 0, 0.05);
-            animation: slideDown 0.3s ease-out;
+            background: rgba(255, 255, 255, 0.95);
         }
 
-        .suggesties {
-            background: rgba(255, 255, 255, 0.95);
+        @media (prefers-color-scheme: dark) {
+            .suggesties {
+                background: rgba(20, 20, 20, 0.98);
+            }
+            .suggesties li {
+                color: #ffffff;
+            }
+            .suggesties li:hover {
+                background: #3a3a3a;
+            }
         }
 
         .suggesties li {
@@ -494,9 +538,6 @@
             border-radius: 16px;
             transition: all 0.2s ease;
             margin: 2px 0;
-        }
-
-        .suggesties li {
             color: #1a1a1a;
         }
 
@@ -505,18 +546,28 @@
             transform: translateX(5px);
         }
 
+        .error, .loading {
+            margin-top: 16px;
+            font-size: 14px;
+            text-align: center;
+            padding: 8px 20px;
+            border-radius: 50px;
+            display: none;
+        }
+
+        .error {
+            background: rgba(220, 53, 69, 0.9);
+            color: white;
+        }
+
+        .loading {
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+        }
+
         @media (prefers-color-scheme: dark) {
-            .suggesties {
-                background: rgba(20, 20, 20, 0.98);
-                border-color: rgba(255, 255, 255, 0.1);
-            }
-            
-            .suggesties li {
-                color: #ffffff;
-            }
-            
-            .suggesties li:hover {
-                background: #3a3a3a;
+            .loading {
+                background: rgba(255, 255, 255, 0.2);
             }
         }
 
@@ -531,95 +582,25 @@
             }
         }
 
-        .error {
-            margin-top: 16px;
-            color: white;
-            font-size: 14px;
-            text-align: center;
-            padding: 8px 20px;
-            border-radius: 50px;
-            background: rgba(220, 53, 69, 0.9);
-            display: none;
-            animation: fadeIn 0.3s ease-out;
-        }
-
-        .loading {
-            margin-top: 16px;
-            font-size: 14px;
-            text-align: center;
-            padding: 8px 20px;
-            border-radius: 50px;
-            display: none;
-            animation: fadeIn 0.3s ease-out;
-        }
-
-        .loading {
-            background: rgba(0, 0, 0, 0.5);
-            color: white;
-        }
-
-        @media (prefers-color-scheme: dark) {
-            .loading {
-                background: rgba(255, 255, 255, 0.2);
-                color: white;
-            }
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-            to {
-                opacity: 1;
-            }
-        }
-
-        .suggesties::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        .suggesties::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 10px;
-        }
-
-        .suggesties::-webkit-scrollbar-thumb {
-            background: #888;
-            border-radius: 10px;
-        }
-
-        .suggesties::-webkit-scrollbar-thumb:hover {
-            background: #555;
-        }
-
-        @media (prefers-color-scheme: dark) {
-            .suggesties::-webkit-scrollbar-track {
-                background: #2a2a2a;
-            }
-            
-            .suggesties::-webkit-scrollbar-thumb {
-                background: #666;
-            }
-            
-            .suggesties::-webkit-scrollbar-thumb:hover {
-                background: #888;
-            }
-        }
-        
-        /* Responsive aanpassingen */
         @media (max-width: 600px) {
             .clock-container {
                 font-size: 1.5rem;
                 padding: 8px 16px;
-                bottom: 10px;
+            }
+            .welcome-container {
+                font-size: 0.9rem;
+                padding: 8px 16px;
+                top: 10px;
                 left: 10px;
             }
-            
             .offline-toast {
                 top: 10px;
                 right: 10px;
                 padding: 8px 16px;
                 font-size: 0.8rem;
+            }
+            .zoek-container {
+                margin-top: 100px;
             }
         }
     </style>
@@ -630,8 +611,16 @@
         <div id="bg2" class="background-image"></div>
     </div>
 
-    <!-- Klok widget -->
+    <!-- Klok -->
     <div class="clock-container" id="clock">--:--</div>
+    
+    <!-- Welkomstbericht -->
+    <div class="welcome-container" id="welcomeMsg"></div>
+    
+    <!-- Feitjes widget -->
+    <div class="facts-container" id="factsContainer">
+        <span id="factText">✨ Leuk feitje komt eraan...</span>
+    </div>
     
     <!-- Offline melding -->
     <div class="offline-toast" id="offlineToast">
@@ -659,51 +648,152 @@
         <button class="menu-sluiten" id="menuSluiten">✕</button>
         <h2>Instellingen</h2>
         
+        <div class="setting-toggle">
+            <span>💡 Weetjes tonen</span>
+            <label class="toggle-switch">
+                <input type="checkbox" id="toggleFacts" checked>
+                <span class="toggle-slider"></span>
+            </label>
+        </div>
+        
         <h3>Kies zoekmachine</h3>
         <div class="zoekmachine-opties" id="zoekmachineOpties">
             <div class="zoekmachine-optie" data-engine="google">
                 <input type="radio" name="zoekmachine" id="engineGoogle" value="google" checked>
                 <label for="engineGoogle">🔍 Google</label>
-                <span class="url">google.com</span>
             </div>
             <div class="zoekmachine-optie" data-engine="bing">
                 <input type="radio" name="zoekmachine" id="engineBing" value="bing">
                 <label for="engineBing">🅱️ Bing</label>
-                <span class="url">bing.com</span>
             </div>
             <div class="zoekmachine-optie" data-engine="duckduckgo">
                 <input type="radio" name="zoekmachine" id="engineDuckDuckGo" value="duckduckgo">
                 <label for="engineDuckDuckGo">🦆 DuckDuckGo</label>
-                <span class="url">duckduckgo.com</span>
             </div>
             <div class="zoekmachine-optie" data-engine="yahoo">
                 <input type="radio" name="zoekmachine" id="engineYahoo" value="yahoo">
                 <label for="engineYahoo">📰 Yahoo</label>
-                <span class="url">yahoo.com</span>
             </div>
         </div>
     </div>
 
     <script>
-        // ===== ZOEKICOON AANPASSEN OP BASIS VAN THEMA =====
-        function updateZoekIcoon() {
-            const zoekIcoon = document.getElementById('zoekIcoon');
-            const isDonker = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            
-            if (isDonker) {
-                zoekIcoon.src = 'wittezoekknop.png';
-            } else {
-                zoekIcoon.src = 'zwartezoekknop.png';
+        // ===== NAAM INSTELLEN (eerste keer) =====
+        let userName = localStorage.getItem('userName');
+        
+        function askForName() {
+            if (!userName) {
+                userName = prompt('Welkom! Wat is je naam?', '');
+                if (userName && userName.trim()) {
+                    userName = userName.trim();
+                    localStorage.setItem('userName', userName);
+                } else {
+                    userName = 'bezoeker';
+                    localStorage.setItem('userName', userName);
+                }
+                updateWelcomeMessage();
             }
         }
         
-        // Update bij laden
-        updateZoekIcoon();
+        function updateWelcomeMessage() {
+            const now = new Date();
+            const hour = now.getHours();
+            let greeting = '';
+            
+            if (hour < 6) greeting = '🌙 Goedenacht';
+            else if (hour < 12) greeting = '🌅 Goedemorgen';
+            else if (hour < 18) greeting = '☀️ Goedemiddag';
+            else greeting = '🌙 Goedenavond';
+            
+            const welcomeDiv = document.getElementById('welcomeMsg');
+            welcomeDiv.textContent = `${greeting}, ${userName}!`;
+        }
         
-        // Luister naar thema veranderingen (sommige browsers ondersteunen dit)
+        askForName();
+        updateWelcomeMessage();
+        setInterval(updateWelcomeMessage, 60000); // Update elke minuut
+        
+        // ===== FEITJES FUNCTIE =====
+        let feitjes = [];
+        let factInterval = null;
+        let factsEnabled = true;
+        
+        async function laadFeitjes() {
+            try {
+                const response = await fetch('feitjes.txt');
+                if (!response.ok) throw new Error('Kan feitjes.txt niet laden');
+                const text = await response.text();
+                feitjes = text.trim().split('\n').filter(line => line.trim().length > 0);
+                console.log(`${feitjes.length} feitjes geladen`);
+                startFactRotation();
+            } catch (err) {
+                console.error('Feitjes fout:', err);
+                document.getElementById('factText').textContent = '💡 Kon feitjes niet laden. Maak een bestand "feitjes.txt" aan.';
+            }
+        }
+        
+        function showRandomFact() {
+            if (!factsEnabled || feitjes.length === 0) return;
+            const randomIndex = Math.floor(Math.random() * feitjes.length);
+            const fact = feitjes[randomIndex];
+            document.getElementById('factText').textContent = `💡 ${fact}`;
+        }
+        
+        function startFactRotation() {
+            if (factInterval) clearInterval(factInterval);
+            if (factsEnabled && feitjes.length > 0) {
+                showRandomFact();
+                factInterval = setInterval(showRandomFact, 10000);
+            }
+        }
+        
+        function stopFactRotation() {
+            if (factInterval) {
+                clearInterval(factInterval);
+                factInterval = null;
+            }
+        }
+        
+        function toggleFacts(enable) {
+            factsEnabled = enable;
+            const factsContainer = document.getElementById('factsContainer');
+            
+            if (enable) {
+                factsContainer.classList.remove('hidden');
+                startFactRotation();
+            } else {
+                factsContainer.classList.add('hidden');
+                stopFactRotation();
+            }
+            
+            localStorage.setItem('factsEnabled', enable);
+        }
+        
+        // Laad feitjes instelling
+        const savedFactsEnabled = localStorage.getItem('factsEnabled');
+        if (savedFactsEnabled !== null) {
+            factsEnabled = savedFactsEnabled === 'true';
+        }
+        
+        const toggleCheckbox = document.getElementById('toggleFacts');
+        toggleCheckbox.checked = factsEnabled;
+        toggleCheckbox.addEventListener('change', (e) => {
+            toggleFacts(e.target.checked);
+        });
+        
+        // Start feitjes
+        laadFeitjes();
+        
+        // ===== ZOEKICOON THEMA =====
+        function updateZoekIcoon() {
+            const zoekIcoon = document.getElementById('zoekIcoon');
+            const isDonker = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            zoekIcoon.src = isDonker ? 'wittezoekknop.png' : 'zwartezoekknop.png';
+        }
+        updateZoekIcoon();
         window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', updateZoekIcoon);
         
-        // ===== KLOK FUNCTIE =====
+        // ===== KLOK =====
         function updateClock() {
             const now = new Date();
             const hours = now.getHours().toString().padStart(2, '0');
@@ -719,153 +809,109 @@
         
         function updateOfflineStatus() {
             if (!navigator.onLine) {
-                // Als we offline zijn, toon de melding
                 offlineToast.classList.add('show');
                 wasOffline = true;
             } else if (wasOffline) {
-                // Als we weer online komen EN we waren eerder offline, toon de melding kort
                 offlineToast.classList.add('show');
-                // Verander de tekst naar "Je bent weer online!"
                 const toastSpan = offlineToast.querySelector('span:last-child');
-                const originalText = toastSpan.textContent;
                 toastSpan.textContent = '✅ Je bent weer online!';
                 offlineToast.style.background = 'rgba(40, 167, 69, 0.95)';
-                
-                // Verberg de melding na 3 seconden
                 setTimeout(() => {
                     offlineToast.classList.remove('show');
-                    // Reset de tekst en kleur voor de volgende keer
-                    toastSpan.textContent = originalText;
+                    toastSpan.textContent = 'Whoops... je bent offline';
                     offlineToast.style.background = 'rgba(220, 53, 69, 0.95)';
                 }, 3000);
-                
                 wasOffline = false;
             }
         }
         
-        // Controleer bij laden
         updateOfflineStatus();
-        
-        // Luister naar online/offline events
         window.addEventListener('online', updateOfflineStatus);
         window.addEventListener('offline', updateOfflineStatus);
+        offlineToast.addEventListener('click', () => offlineToast.classList.remove('show'));
         
-        // Klik op offline melding om te sluiten (alleen als het de offline melding is, niet de online melding)
-        offlineToast.addEventListener('click', () => {
-            offlineToast.classList.remove('show');
-        });
-        
-        // ===== BESTAANDE CODE VOOR ZOEKMACHINE, SUGGESTIES EN ACHTERGROND =====
-        
-        // Data structuur voor suggesties
+        // ===== ZOEKMACHINE, SUGGESTIES, ACHTERGROND =====
         let suggesties = [];
         let huidigeAchtergrond = 0;
         let totaalAchtergronden = 10;
         let isAanHetWisselen = false;
+        let zoekmachine = { type: 'google' };
         
-        // Zoekmachine instellingen
-        let zoekmachine = {
-            type: 'google'
-        };
-
-        // Zoekmachine URLs
         const zoekmachineUrls = {
             google: 'https://www.google.com/search?q={q}',
             bing: 'https://www.bing.com/search?q={q}',
             duckduckgo: 'https://duckduckgo.com/?q={q}',
             yahoo: 'https://search.yahoo.com/search?p={q}'
         };
-
-        // Lijst van mogelijke afbeelding extensies
+        
         const afbeeldingExtensies = ['.png', '.jpg', '.jpeg', '.gif', '.webp'];
-
-        // Laad opgeslagen instellingen
+        
         function laadInstellingen() {
             const opgeslagen = localStorage.getItem('zoekmachineInstellingen');
             if (opgeslagen) {
                 try {
                     const instellingen = JSON.parse(opgeslagen);
                     zoekmachine = instellingen;
-                    
                     const radio = document.querySelector(`input[name="zoekmachine"][value="${zoekmachine.type}"]`);
                     if (radio) radio.checked = true;
-                } catch (e) {
-                    console.error('Fout bij laden instellingen:', e);
-                }
+                } catch (e) {}
             }
         }
-
+        
         function opslaanInstellingen() {
             localStorage.setItem('zoekmachineInstellingen', JSON.stringify(zoekmachine));
         }
-
+        
         function voerZoekopdrachtUit(query) {
             if (!query) return;
-            
-            const exacteMatch = suggesties.find(s => 
-                s.tekst.toLowerCase() === query.toLowerCase() && s.url
-            );
-            
+            const exacteMatch = suggesties.find(s => s.tekst.toLowerCase() === query.toLowerCase() && s.url);
             if (exacteMatch) {
-                openURL(exacteMatch.url);
+                let url = exacteMatch.url;
+                if (url && !url.match(/^https?:\/\//i)) url = 'https://' + url;
+                window.location.href = url;
                 return;
             }
-            
             const baseUrl = zoekmachineUrls[zoekmachine.type] || zoekmachineUrls.google;
-            const searchUrl = baseUrl.replace('{q}', encodeURIComponent(query));
-            window.location.href = searchUrl;
+            window.location.href = baseUrl.replace('{q}', encodeURIComponent(query));
         }
-
-        function openURL(url) {
-            if (url && !url.match(/^https?:\/\//i)) {
-                url = 'https://' + url;
-            }
-            window.location.href = url;
-        }
-
+        
         function openMenu() {
             document.getElementById('instellingenMenu').classList.add('active');
             document.getElementById('overlay').classList.add('active');
         }
-
+        
         function sluitMenu() {
             document.getElementById('instellingenMenu').classList.remove('active');
             document.getElementById('overlay').classList.remove('active');
         }
-
+        
         async function vindAfbeelding(basisNaam) {
             for (const ext of afbeeldingExtensies) {
                 const url = basisNaam + ext;
                 try {
                     const response = await fetch(url, { method: 'HEAD' });
-                    if (response.ok) {
-                        return url;
-                    }
+                    if (response.ok) return url;
                 } catch (e) {}
             }
             return null;
         }
-
+        
         function kiesRandomAchtergrond() {
             return Math.floor(Math.random() * totaalAchtergronden) + 1;
         }
-
+        
         async function wisselAchtergrond() {
             if (isAanHetWisselen) return;
             isAanHetWisselen = true;
-            
             let nieuwNummer;
             do {
                 nieuwNummer = kiesRandomAchtergrond();
             } while (nieuwNummer === huidigeAchtergrond && totaalAchtergronden > 1);
-            
             const afbeeldingUrl = await vindAfbeelding(`${nieuwNummer}`);
-            
             if (afbeeldingUrl) {
                 const bg1 = document.getElementById('bg1');
                 const bg2 = document.getElementById('bg2');
                 const isBg1Active = bg1.classList.contains('active');
-                
                 if (isBg1Active) {
                     bg2.style.backgroundImage = `url('${afbeeldingUrl}')`;
                     bg2.classList.add('active');
@@ -879,7 +925,7 @@
             }
             isAanHetWisselen = false;
         }
-
+        
         function startAchtergrondRotatie() {
             setTimeout(async () => {
                 for (let i = 1; i <= totaalAchtergronden; i++) {
@@ -894,19 +940,16 @@
                 setInterval(() => wisselAchtergrond(), 10000);
             }, 500);
         }
-
+        
         async function laadSuggesties() {
             const loading = document.getElementById('loading');
             const error = document.getElementById('error');
-            
             try {
                 loading.style.display = 'block';
                 const response = await fetch('zoeksuggesties.txt');
                 if (!response.ok) throw new Error('Kan zoeksuggesties.txt niet laden');
-                
                 const text = await response.text();
                 const regels = text.trim().split('\n');
-                
                 suggesties = regels.map(regel => {
                     if (!regel.trim()) return null;
                     const eersteGelijkteken = regel.indexOf('=');
@@ -919,7 +962,6 @@
                         return { tekst: regel.trim(), url: null };
                     }
                 }).filter(s => s !== null);
-                
                 loading.style.display = 'none';
             } catch (err) {
                 loading.style.display = 'none';
@@ -927,13 +969,13 @@
                 error.textContent = `Fout: ${err.message}`;
             }
         }
-
+        
         function zoekSuggesties(input) {
             if (!input || suggesties.length === 0) return [];
             input = input.toLowerCase();
             return suggesties.filter(s => s.tekst.toLowerCase().includes(input)).slice(0, 10);
         }
-
+        
         function toonSuggesties(suggestieLijst) {
             const lijst = document.getElementById('suggesties-lijst');
             if (suggestieLijst.length === 0) {
@@ -946,16 +988,20 @@
                 li.textContent = suggestie.tekst + (suggestie.url ? ' →' : '');
                 li.onclick = () => {
                     document.getElementById('zoekveld').value = suggestie.tekst;
-                    if (suggestie.url) openURL(suggestie.url);
-                    else voerZoekopdrachtUit(suggestie.tekst);
+                    if (suggestie.url) {
+                        let url = suggestie.url;
+                        if (url && !url.match(/^https?:\/\//i)) url = 'https://' + url;
+                        window.location.href = url;
+                    } else {
+                        voerZoekopdrachtUit(suggestie.tekst);
+                    }
                     lijst.style.display = 'none';
                 };
                 lijst.appendChild(li);
             });
             lijst.style.display = 'block';
         }
-
-        // Event listeners
+        
         document.addEventListener('DOMContentLoaded', () => {
             laadInstellingen();
             laadSuggesties();
@@ -990,10 +1036,7 @@
                 });
             });
             
-            zoekveld.addEventListener('input', (e) => {
-                toonSuggesties(zoekSuggesties(e.target.value));
-            });
-            
+            zoekveld.addEventListener('input', (e) => toonSuggesties(zoekSuggesties(e.target.value)));
             zoekKnop.addEventListener('click', () => voerZoekopdrachtUit(zoekveld.value));
             zoekveld.addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') voerZoekopdrachtUit(zoekveld.value);
