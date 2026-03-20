@@ -14,6 +14,7 @@ microsoft 365 copilot = m365.cloud.microsoft
 microsoft copilot = copilot.com
 microsoft office = office.com
 microsoft = microsoft.com
+copilot = copilot.com
 canva = canva.com
 google drive = drive.google.com/drive/
 roblox = roblox.com
@@ -35,3 +36,6 @@ outlook = outlook.live.com
 temu = temu.com
 aliexpress = aliexpress.com
 discord = discord.com
+dji = dji.nl
+dji store = store.dji.com
+uitslagen verkiezingen 2026
