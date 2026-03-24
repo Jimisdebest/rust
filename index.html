@@ -603,6 +603,164 @@
                 margin-top: 100px;
             }
         }
+
+        /* ===== OVERLAY STIJLEN (nieuws & nexi) ===== */
+        .in-screen-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+            z-index: 2000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        .in-screen-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        .overlay-container {
+            width: 90%;
+            max-width: 1200px;
+            height: 85%;
+            background: #fff;
+            border-radius: 32px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+        }
+        @media (prefers-color-scheme: dark) {
+            .overlay-container {
+                background: #1e1e1e;
+            }
+        }
+        .overlay-header {
+            display: flex;
+            justify-content: flex-end;
+            padding: 16px 20px;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+        }
+        @media (prefers-color-scheme: dark) {
+            .overlay-header {
+                border-bottom-color: rgba(255,255,255,0.1);
+            }
+        }
+        .sluit-overlay {
+            background: rgba(0,0,0,0.1);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            color: #333;
+        }
+        @media (prefers-color-scheme: dark) {
+            .sluit-overlay {
+                background: rgba(255,255,255,0.2);
+                color: white;
+            }
+        }
+        .sluit-overlay:hover {
+            background: rgba(0,0,0,0.2);
+            transform: scale(1.05);
+        }
+        .overlay-iframe {
+            flex: 1;
+            width: 100%;
+            border: none;
+            background: white;
+        }
+        @media (prefers-color-scheme: dark) {
+            .overlay-iframe {
+                background: #1e1e1e;
+            }
+        }
+
+        /* NEXI LOGO (rechtsboven, klikbaar voor overlay) */
+        .nexi-logo {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 150;
+            width: 48px;
+            height: 48px;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+            background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(8px);
+            border-radius: 50%;
+            padding: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        .nexi-logo:hover {
+            transform: scale(1.08);
+            background: rgba(0,0,0,0.6);
+        }
+        .nexi-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 50%;
+        }
+        
+        /* NIEUWS KNOPJE */
+        .nieuws-knop {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(0);
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(10px);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 40px;
+            color: white;
+            font-family: 'Inter', sans-serif;
+            font-weight: 500;
+            font-size: 1rem;
+            cursor: pointer;
+            z-index: 110;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            bottom: 90px;
+        }
+        .nieuws-knop:hover {
+            background: rgba(0, 0, 0, 0.8);
+            transform: translateX(-50%) scale(1.02);
+        }
+        @media (max-width: 768px) {
+            .nieuws-knop {
+                bottom: 80px;
+                font-size: 0.85rem;
+                padding: 8px 16px;
+            }
+            .nexi-logo {
+                width: 40px;
+                height: 40px;
+                top: 12px;
+                right: 12px;
+            }
+            .welcome-container {
+                top: 12px;
+                left: 12px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -626,6 +784,14 @@
     <div class="offline-toast" id="offlineToast">
         <span>⚠️</span>
         <span>Whoops... je bent offline</span>
+    </div>
+
+    <!-- NIEUWS KNOPJE -->
+    <button class="nieuws-knop" id="nieuwsKnop">📰 Nieuws</button>
+
+    <!-- NEXI LOGO (alleen logo rechtsboven, klik opent nexi overlay) -->
+    <div class="nexi-logo" id="nexiLogo">
+        <img src="https://jimisdebest.github.io/nexi/logo.png" alt="Nexi" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ccircle cx=%2250%22 cy=%2250%22 r=%2245%22 fill=%22%234285F4%22/%3E%3Ctext x=%2250%22 y=%2265%22 text-anchor=%22middle%22 fill=%22white%22 font-size=%2240%22 font-weight=%22bold%22%3EN%3C/text%3E%3C/svg%3E';">
     </div>
 
     <div class="zoek-container">
@@ -677,8 +843,28 @@
         </div>
     </div>
 
+    <!-- NIEUWS OVERLAY (in-screen) -->
+    <div id="nieuwsOverlay" class="in-screen-overlay">
+        <div class="overlay-container">
+            <div class="overlay-header">
+                <button class="sluit-overlay" id="sluitNieuwsBtn">✕</button>
+            </div>
+            <iframe id="nieuwsIframe" class="overlay-iframe" src="https://jimisdebest.github.io/nieuws" title="Nieuws"></iframe>
+        </div>
+    </div>
+
+    <!-- NEXI OVERLAY (in-screen) -->
+    <div id="nexiOverlay" class="in-screen-overlay">
+        <div class="overlay-container">
+            <div class="overlay-header">
+                <button class="sluit-overlay" id="sluitNexiBtn">✕</button>
+            </div>
+            <iframe id="nexiIframe" class="overlay-iframe" src="https://jimisdebest.github.io/nexi" title="Nexi Chatbot"></iframe>
+        </div>
+    </div>
+
     <script>
-        // ===== NAAM INSTELLEN (eerste keer) =====
+        // ===== NAAM INSTELLEN =====
         let userName = localStorage.getItem('userName');
         
         function askForName() {
@@ -711,9 +897,9 @@
         
         askForName();
         updateWelcomeMessage();
-        setInterval(updateWelcomeMessage, 60000); // Update elke minuut
+        setInterval(updateWelcomeMessage, 60000);
         
-        // ===== FEITJES FUNCTIE =====
+        // ===== FEITJES =====
         let feitjes = [];
         let factInterval = null;
         let factsEnabled = true;
@@ -724,10 +910,8 @@
                 if (!response.ok) throw new Error('Kan feitjes.txt niet laden');
                 const text = await response.text();
                 feitjes = text.trim().split('\n').filter(line => line.trim().length > 0);
-                console.log(`${feitjes.length} feitjes geladen`);
                 startFactRotation();
             } catch (err) {
-                console.error('Feitjes fout:', err);
                 document.getElementById('factText').textContent = '💡 Kon feitjes niet laden. Maak een bestand "feitjes.txt" aan.';
             }
         }
@@ -757,7 +941,6 @@
         function toggleFacts(enable) {
             factsEnabled = enable;
             const factsContainer = document.getElementById('factsContainer');
-            
             if (enable) {
                 factsContainer.classList.remove('hidden');
                 startFactRotation();
@@ -765,23 +948,14 @@
                 factsContainer.classList.add('hidden');
                 stopFactRotation();
             }
-            
             localStorage.setItem('factsEnabled', enable);
         }
         
-        // Laad feitjes instelling
         const savedFactsEnabled = localStorage.getItem('factsEnabled');
-        if (savedFactsEnabled !== null) {
-            factsEnabled = savedFactsEnabled === 'true';
-        }
-        
+        if (savedFactsEnabled !== null) factsEnabled = savedFactsEnabled === 'true';
         const toggleCheckbox = document.getElementById('toggleFacts');
         toggleCheckbox.checked = factsEnabled;
-        toggleCheckbox.addEventListener('change', (e) => {
-            toggleFacts(e.target.checked);
-        });
-        
-        // Start feitjes
+        toggleCheckbox.addEventListener('change', (e) => toggleFacts(e.target.checked));
         laadFeitjes();
         
         // ===== ZOEKICOON THEMA =====
@@ -806,7 +980,6 @@
         // ===== OFFLINE DETECTIE =====
         const offlineToast = document.getElementById('offlineToast');
         let wasOffline = false;
-        
         function updateOfflineStatus() {
             if (!navigator.onLine) {
                 offlineToast.classList.add('show');
@@ -824,7 +997,6 @@
                 wasOffline = false;
             }
         }
-        
         updateOfflineStatus();
         window.addEventListener('online', updateOfflineStatus);
         window.addEventListener('offline', updateOfflineStatus);
@@ -879,7 +1051,6 @@
             document.getElementById('instellingenMenu').classList.add('active');
             document.getElementById('overlay').classList.add('active');
         }
-        
         function sluitMenu() {
             document.getElementById('instellingenMenu').classList.remove('active');
             document.getElementById('overlay').classList.remove('active');
@@ -1002,6 +1173,44 @@
             lijst.style.display = 'block';
         }
         
+        // ===== NIEUWS OVERLAY FUNCTIES =====
+        const nieuwsOverlay = document.getElementById('nieuwsOverlay');
+        const nieuwsKnop = document.getElementById('nieuwsKnop');
+        const sluitNieuwsBtn = document.getElementById('sluitNieuwsBtn');
+        
+        function openNieuws() { nieuwsOverlay.classList.add('active'); }
+        function closeNieuws() { nieuwsOverlay.classList.remove('active'); }
+        
+        nieuwsKnop.addEventListener('click', openNieuws);
+        sluitNieuwsBtn.addEventListener('click', closeNieuws);
+        nieuwsOverlay.addEventListener('click', (e) => { if (e.target === nieuwsOverlay) closeNieuws(); });
+        
+        // ===== NEXI OVERLAY FUNCTIES (logo opent nexi in-screen) =====
+        const nexiOverlay = document.getElementById('nexiOverlay');
+        const nexiLogoDiv = document.getElementById('nexiLogo');
+        const sluitNexiBtn = document.getElementById('sluitNexiBtn');
+        
+        function openNexi() { nexiOverlay.classList.add('active'); }
+        function closeNexi() { nexiOverlay.classList.remove('active'); }
+        
+        nexiLogoDiv.addEventListener('click', openNexi);
+        sluitNexiBtn.addEventListener('click', closeNexi);
+        nexiOverlay.addEventListener('click', (e) => { if (e.target === nexiOverlay) closeNexi(); });
+        
+        // ESC to close any active overlay
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                if (nieuwsOverlay.classList.contains('active')) closeNieuws();
+                if (nexiOverlay.classList.contains('active')) closeNexi();
+                if (document.getElementById('instellingenMenu').classList.contains('active')) sluitMenu();
+            }
+            if (e.ctrlKey && e.key === 'i') {
+                e.preventDefault();
+                if (document.getElementById('instellingenMenu').classList.contains('active')) sluitMenu();
+                else openMenu();
+            }
+        });
+        
         document.addEventListener('DOMContentLoaded', () => {
             laadInstellingen();
             laadSuggesties();
@@ -1013,14 +1222,6 @@
             const instellingenKnop = document.getElementById('instellingenKnop');
             const menuSluiten = document.getElementById('menuSluiten');
             const overlay = document.getElementById('overlay');
-            
-            document.addEventListener('keydown', (e) => {
-                if (e.ctrlKey && e.key === 'i') {
-                    e.preventDefault();
-                    if (document.getElementById('instellingenMenu').classList.contains('active')) sluitMenu();
-                    else openMenu();
-                }
-            });
             
             instellingenKnop.addEventListener('click', openMenu);
             menuSluiten.addEventListener('click', sluitMenu);
