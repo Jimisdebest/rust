@@ -2,579 +2,395 @@
 <html lang="nl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zoekmachine</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Nexi</title>
+    <link rel="icon" type="image/png" href="logo.png">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
-        @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap');
-
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            font-family: system-ui, 'Segoe UI', 'Inter', -apple-system, sans-serif;
         }
 
-        body {
-            font-family: 'Inter', sans-serif;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            position: relative;
-            transition: background-color 0.3s ease, color 0.3s ease;
-        }
-
-        body {
-            background-color: #f5f5f5;
-            color: #1a1a1a;
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f5f7fb;
+            --surface: #ffffff;
+            --surface-elevated: #f8fafc;
+            --text-primary: #1e293b;
+            --text-secondary: #475569;
+            --accent: #3b82f6;
+            --accent-dark: #2563eb;
+            --accent-light: #93c5fd;
+            --border: #e2e8f0;
+            --user-bubble: #3b82f6;
+            --user-bubble-text: #ffffff;
+            --bot-bubble: #f1f5f9;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
         }
 
         @media (prefers-color-scheme: dark) {
-            body {
-                background-color: #0a0a0a;
-                color: #ffffff;
-            }
-            
-            .background-image {
-                opacity: 0;
-                transition: opacity 1.5s ease-in-out;
-                animation: fadeFromBlack 2s ease-in-out;
-            }
-            
-            @keyframes fadeFromBlack {
-                0% {
-                    opacity: 0;
-                    background-color: black;
-                }
-                100% {
-                    opacity: 1;
-                    background-color: transparent;
-                }
+            :root {
+                --bg-primary: #0f172a;
+                --bg-secondary: #1e293b;
+                --surface: #1e293b;
+                --surface-elevated: #334155;
+                --text-primary: #f1f5f9;
+                --text-secondary: #cbd5e1;
+                --accent: #60a5fa;
+                --accent-dark: #3b82f6;
+                --accent-light: #1e3a8a;
+                --border: #334155;
+                --user-bubble: #3b82f6;
+                --user-bubble-text: #ffffff;
+                --bot-bubble: #334155;
+                --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
             }
         }
 
-        .background-container {
-            position: fixed;
-            top: 0;
-            left: 0;
+        body {
+            background: var(--bg-secondary);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+            overflow: hidden;
+        }
+
+        .chat-app {
+            width: 100%;
+            max-width: 1200px;
+            height: 95vh;
+            max-height: 900px;
+            background: var(--bg-primary);
+            border-radius: 32px;
+            box-shadow: var(--shadow), 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+
+        .chat-header {
+            background: var(--surface);
+            padding: 18px 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+
+        .chat-header h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .messages-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            background: var(--bg-secondary);
+            scroll-behavior: smooth;
+        }
+
+        .message-bot {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            max-width: 85%;
+            animation: fadeSlideUp 0.25s ease;
+        }
+
+        .bot-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            background: var(--surface);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .bot-avatar img {
             width: 100%;
             height: 100%;
-            z-index: -1;
+            object-fit: cover;
         }
 
-        .background-image {
-            position: absolute;
-            top: 0;
-            left: 0;
+        .bubble-bot {
+            background: var(--bot-bubble);
+            border-radius: 20px;
+            border-bottom-left-radius: 6px;
+            padding: 10px 18px;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            line-height: 1.45;
+            word-break: break-word;
+            box-shadow: var(--shadow);
+        }
+
+        .message-user {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            justify-content: flex-end;
+            max-width: 85%;
+            align-self: flex-end;
+            animation: fadeSlideUp 0.25s ease;
+            flex-direction: row-reverse;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            background: var(--surface);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .user-avatar img {
             width: 100%;
             height: 100%;
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            opacity: 0;
-            transition: opacity 1.5s ease-in-out;
+            object-fit: cover;
         }
 
-        .background-image.active {
+        .bubble-user {
+            background: var(--user-bubble);
+            color: var(--user-bubble-text);
+            padding: 10px 18px;
+            border-radius: 20px;
+            border-bottom-right-radius: 6px;
+            word-break: break-word;
+            box-shadow: var(--shadow);
+        }
+
+        .generated-image {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 12px;
+            margin-top: 10px;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+        }
+
+        .generated-image:hover {
+            transform: scale(1.01);
+        }
+
+        .thinking-bubble {
+            background: var(--bot-bubble);
+            opacity: 0.7;
+            font-style: italic;
+        }
+
+        .analysis-message {
+            background: var(--surface-elevated);
+            border-left: 3px solid var(--accent);
+            padding: 8px 12px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 4px;
+            animation: fadeSlideUp 0.3s ease;
+            max-width: 85%;
+        }
+
+        .analysis-step {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 0;
+        }
+
+        .analysis-step .check {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
+
+        .check.success { background: #22c55e; color: white; }
+        .check.error { background: #ef4444; color: white; }
+        .check.pending { background: #eab308; color: white; }
+
+        .input-bar {
+            background: var(--surface);
+            border-top: 1px solid var(--border);
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+
+        .plus-btn {
+            background: var(--surface-elevated);
+            border: 1px solid var(--border);
+            width: 48px;
+            height: 48px;
+            border-radius: 60px;
+            font-size: 1.6rem;
+            font-weight: 400;
+            color: var(--text-primary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .plus-btn:hover {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .text-input-wrapper {
+            flex: 1;
+            position: relative;
+        }
+
+        .chip-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .mode-chip {
+            background: var(--accent-light);
+            color: var(--accent-dark);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: 0.1s;
+        }
+
+        .mode-chip .remove {
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            opacity: 0.7;
+        }
+
+        .mode-chip .remove:hover {
             opacity: 1;
         }
 
-        /* Klok */
-        .clock-container {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            z-index: 100;
-            font-family: 'Space Mono', monospace;
-            font-size: 2.5rem;
-            font-weight: 700;
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(10px);
-            padding: 12px 24px;
-            border-radius: 60px;
-            color: white;
-            letter-spacing: 2px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-        }
-        
-        @media (prefers-color-scheme: dark) {
-            .clock-container {
-                background: rgba(0, 0, 0, 0.7);
-            }
-        }
-
-        /* Welkomstbericht */
-        .welcome-container {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            z-index: 100;
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(10px);
-            padding: 12px 24px;
-            border-radius: 60px;
-            color: white;
-            font-size: 1.1rem;
-            font-weight: 500;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-        }
-
-        /* Feitjes widget - midden onderaan */
-        .facts-container {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 100;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(10px);
-            padding: 12px 24px;
-            border-radius: 60px;
-            color: white;
-            font-size: 0.9rem;
-            text-align: center;
-            max-width: 80vw;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-            cursor: pointer;
-        }
-        
-        .facts-container:hover {
-            background: rgba(0, 0, 0, 0.8);
-            transform: translateX(-50%) scale(1.02);
-        }
-        
-        @media (max-width: 768px) {
-            .facts-container {
-                font-size: 0.75rem;
-                padding: 8px 16px;
-                white-space: normal;
-                max-width: 90vw;
-                text-align: center;
-                line-height: 1.3;
-            }
-        }
-        
-        .facts-container.hidden {
-            display: none;
-        }
-        
-        /* Offline melding */
-        .offline-toast {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 100;
-            background: rgba(220, 53, 69, 0.95);
-            backdrop-filter: blur(10px);
-            color: white;
-            padding: 12px 24px;
-            border-radius: 50px;
-            font-family: 'Inter', sans-serif;
-            font-weight: 500;
-            font-size: 0.9rem;
-            display: none;
-            align-items: center;
-            gap: 8px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-            animation: slideInRight 0.3s ease-out;
-            cursor: pointer;
-        }
-        
-        .offline-toast.show {
-            display: flex;
-        }
-        
-        @keyframes slideInRight {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-        
-        /* Zoekcontainer */
-        .zoek-container {
+        #messageInput {
             width: 100%;
-            max-width: 600px;
-            padding: 20px;
-            margin-top: 80px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .zoek-wrapper {
-            position: relative;
-            width: 100%;
-        }
-
-        .zoekbalk {
-            width: 100%;
-            padding: 16px 70px 16px 24px;
-            font-size: 16px;
-            font-family: 'Inter', sans-serif;
-            font-weight: 400;
-            border: none;
-            border-radius: 50px;
-            transition: all 0.3s ease;
-            background: rgba(255, 255, 255, 0.9);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-            color: #1a1a1a;
-        }
-
-        @media (prefers-color-scheme: dark) {
-            .zoekbalk {
-                background: rgba(20, 20, 20, 0.95);
-                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.8);
-                color: #ffffff;
-            }
-            .zoekbalk::placeholder {
-                color: #aaa;
-            }
-        }
-
-        .zoekbalk:focus {
+            padding: 12px 52px 12px 16px;
+            border-radius: 28px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--text-primary);
+            font-size: 0.95rem;
             outline: none;
-            background: rgba(255, 255, 255, 1);
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+            transition: 0.2s;
         }
 
-        @media (prefers-color-scheme: dark) {
-            .zoekbalk:focus {
-                background: rgba(30, 30, 30, 1);
-            }
+        #messageInput:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
         }
 
-        .zoek-knop {
+        .send-knop {
             position: absolute;
             right: 6px;
             top: 50%;
             transform: translateY(-50%);
-            width: 48px;
-            height: 48px;
+            background: var(--accent);
             border: none;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
-            background: transparent;
-            cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.3s ease;
-            padding: 8px;
-        }
-
-        .zoek-knop img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-        }
-
-        .zoek-knop:hover {
-            transform: translateY(-50%) scale(1.1);
-            background: rgba(0, 0, 0, 0.05);
-        }
-
-        @media (prefers-color-scheme: dark) {
-            .zoek-knop:hover {
-                background: rgba(255, 255, 255, 0.1);
-            }
-        }
-
-        /* Instellingen */
-        .instellingen-knop {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: 48px;
-            height: 48px;
-            border: none;
-            border-radius: 50%;
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            backdrop-filter: blur(5px);
-            z-index: 100;
-            background: rgba(0, 0, 0, 0.5);
             color: white;
+            font-size: 1.2rem;
+            transition: 0.2s;
         }
 
-        @media (prefers-color-scheme: dark) {
-            .instellingen-knop {
-                background: rgba(255, 255, 255, 0.2);
-            }
-            .instellingen-knop:hover {
-                background: rgba(255, 255, 255, 0.3);
-            }
+        .send-knop:hover {
+            background: var(--accent-dark);
+            transform: translateY(-50%) scale(1.02);
         }
 
-        .instellingen-knop:hover {
-            transform: scale(1.1);
-        }
-
-        .instellingen-menu {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) scale(0.9);
-            width: 90%;
-            max-width: 400px;
-            backdrop-filter: blur(10px);
-            border-radius: 30px;
-            padding: 30px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            z-index: 1000;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s ease;
-            background: rgba(255, 255, 255, 0.95);
-            color: #1a1a1a;
-        }
-
-        @media (prefers-color-scheme: dark) {
-            .instellingen-menu {
-                background: rgba(20, 20, 20, 0.98);
-                color: #ffffff;
-            }
-        }
-
-        .instellingen-menu.active {
-            opacity: 1;
-            visibility: visible;
-            transform: translate(-50%, -50%) scale(1);
-        }
-
-        .instellingen-menu h2 {
-            margin-bottom: 20px;
-            font-weight: 500;
-            font-size: 24px;
-        }
-
-        .instellingen-menu h3 {
-            margin: 20px 0 10px 0;
-            font-weight: 500;
-            font-size: 16px;
-        }
-
-        .setting-toggle {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 0;
-            border-bottom: 1px solid rgba(0,0,0,0.1);
-        }
-
-        @media (prefers-color-scheme: dark) {
-            .setting-toggle {
-                border-bottom-color: rgba(255,255,255,0.1);
-            }
-        }
-
-        .toggle-switch {
-            position: relative;
-            display: inline-block;
-            width: 52px;
-            height: 28px;
-        }
-
-        .toggle-switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-
-        .toggle-slider {
+        .plus-menu {
             position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ccc;
-            transition: 0.3s;
-            border-radius: 34px;
-        }
-
-        .toggle-slider:before {
-            position: absolute;
-            content: "";
-            height: 22px;
-            width: 22px;
-            left: 3px;
-            bottom: 3px;
-            background-color: white;
-            transition: 0.3s;
-            border-radius: 50%;
-        }
-
-        input:checked + .toggle-slider {
-            background-color: #007bff;
-        }
-
-        input:checked + .toggle-slider:before {
-            transform: translateX(24px);
-        }
-
-        .zoekmachine-opties {
+            bottom: 90px;
+            left: 28px;
+            background: var(--surface);
+            border-radius: 20px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
+            padding: 8px 0;
             display: flex;
             flex-direction: column;
-            gap: 10px;
-            margin-bottom: 10px;
+            min-width: 200px;
+            z-index: 200;
+            border: 1px solid var(--border);
+            opacity: 0;
+            transform: scale(0.95);
+            pointer-events: none;
+            transition: 0.2s ease;
         }
 
-        .zoekmachine-optie {
+        .plus-menu.open {
+            opacity: 1;
+            transform: scale(1);
+            pointer-events: auto;
+        }
+
+        .menu-optie {
+            background: transparent;
+            border: none;
+            padding: 12px 20px;
+            text-align: left;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
             display: flex;
             align-items: center;
-            padding: 12px 16px;
-            border-radius: 16px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            border: 2px solid transparent;
-            background: #f5f5f5;
+            gap: 12px;
+            color: var(--text-primary);
+            transition: 0.1s;
         }
 
-        @media (prefers-color-scheme: dark) {
-            .zoekmachine-optie {
-                background: #2a2a2a;
-            }
-            .zoekmachine-optie:hover {
-                background: #3a3a3a;
-            }
+        .menu-optie:hover {
+            background: var(--bg-secondary);
         }
 
-        .zoekmachine-optie:hover {
-            background: #e0e0e0;
-        }
-
-        .zoekmachine-optie.selected {
-            border-color: #007bff;
-            background: #e3f2fd;
-        }
-
-        .zoekmachine-optie input[type="radio"] {
-            margin-right: 12px;
-            accent-color: #007bff;
-        }
-
-        .zoekmachine-optie label {
-            flex: 1;
-            cursor: pointer;
-            font-weight: 500;
-        }
-
-        .menu-sluiten {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            width: 36px;
-            height: 36px;
-            border: none;
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 20px;
-            background: #f0f0f0;
-            color: #666;
-        }
-
-        @media (prefers-color-scheme: dark) {
-            .menu-sluiten {
-                background: #333;
-                color: #ccc;
-            }
-        }
-
-        .overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 999;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s ease;
-        }
-
-        .overlay.active {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .suggesties {
-            list-style: none;
-            padding: 8px;
-            margin: 12px 0 0 0;
-            border-radius: 24px;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
-            max-height: 400px;
-            overflow-y: auto;
-            display: none;
-            background: rgba(255, 255, 255, 0.95);
-        }
-
-        @media (prefers-color-scheme: dark) {
-            .suggesties {
-                background: rgba(20, 20, 20, 0.98);
-            }
-            .suggesties li {
-                color: #ffffff;
-            }
-            .suggesties li:hover {
-                background: #3a3a3a;
-            }
-        }
-
-        .suggesties li {
-            padding: 12px 20px;
-            cursor: pointer;
-            border-radius: 16px;
-            transition: all 0.2s ease;
-            margin: 2px 0;
-            color: #1a1a1a;
-        }
-
-        .suggesties li:hover {
-            background: #f0f0f0;
-            transform: translateX(5px);
-        }
-
-        .error, .loading {
-            margin-top: 16px;
-            font-size: 14px;
-            text-align: center;
-            padding: 8px 20px;
-            border-radius: 50px;
-            display: none;
-        }
-
-        .error {
-            background: rgba(220, 53, 69, 0.9);
-            color: white;
-        }
-
-        .loading {
-            background: rgba(0, 0, 0, 0.5);
-            color: white;
-        }
-
-        @media (prefers-color-scheme: dark) {
-            .loading {
-                background: rgba(255, 255, 255, 0.2);
-            }
-        }
-
-        @keyframes slideDown {
+        @keyframes fadeSlideUp {
             from {
                 opacity: 0;
-                transform: translateY(-10px);
+                transform: translateY(8px);
             }
             to {
                 opacity: 1;
@@ -582,679 +398,527 @@
             }
         }
 
-        @media (max-width: 600px) {
-            .clock-container {
-                font-size: 1.5rem;
-                padding: 8px 16px;
+        @media (max-width: 640px) {
+            .message-bot, .message-user {
+                max-width: 95%;
             }
-            .welcome-container {
-                font-size: 0.9rem;
-                padding: 8px 16px;
-                top: 10px;
-                left: 10px;
-            }
-            .offline-toast {
-                top: 10px;
-                right: 10px;
-                padding: 8px 16px;
-                font-size: 0.8rem;
-            }
-            .zoek-container {
-                margin-top: 100px;
-            }
-        }
-
-        /* ===== OVERLAY STIJLEN (nieuws & nexi) ===== */
-        .in-screen-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.85);
-            backdrop-filter: blur(8px);
-            z-index: 2000;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s ease;
-        }
-        .in-screen-overlay.active {
-            opacity: 1;
-            visibility: visible;
-        }
-        .overlay-container {
-            width: 90%;
-            max-width: 1200px;
-            height: 85%;
-            background: #fff;
-            border-radius: 32px;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.3);
-            display: flex;
-            flex-direction: column;
-        }
-        @media (prefers-color-scheme: dark) {
-            .overlay-container {
-                background: #1e1e1e;
-            }
-        }
-        .overlay-header {
-            display: flex;
-            justify-content: flex-end;
-            padding: 16px 20px;
-            border-bottom: 1px solid rgba(0,0,0,0.1);
-        }
-        @media (prefers-color-scheme: dark) {
-            .overlay-header {
-                border-bottom-color: rgba(255,255,255,0.1);
-            }
-        }
-        .sluit-overlay {
-            background: rgba(0,0,0,0.1);
-            border: none;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            font-size: 24px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s;
-            color: #333;
-        }
-        @media (prefers-color-scheme: dark) {
-            .sluit-overlay {
-                background: rgba(255,255,255,0.2);
-                color: white;
-            }
-        }
-        .sluit-overlay:hover {
-            background: rgba(0,0,0,0.2);
-            transform: scale(1.05);
-        }
-        .overlay-iframe {
-            flex: 1;
-            width: 100%;
-            border: none;
-            background: white;
-        }
-        @media (prefers-color-scheme: dark) {
-            .overlay-iframe {
-                background: #1e1e1e;
-            }
-        }
-
-        /* NEXI LOGO (rechtsboven, klikbaar voor overlay) */
-        .nexi-logo {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 150;
-            width: 48px;
-            height: 48px;
-            cursor: pointer;
-            transition: transform 0.2s ease;
-            background: rgba(0,0,0,0.4);
-            backdrop-filter: blur(8px);
-            border-radius: 50%;
-            padding: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-        }
-        .nexi-logo:hover {
-            transform: scale(1.08);
-            background: rgba(0,0,0,0.6);
-        }
-        .nexi-logo img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            border-radius: 50%;
-        }
-        
-        /* NIEUWS KNOPJE */
-        .nieuws-knop {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%) translateY(0);
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(10px);
-            border: none;
-            padding: 10px 20px;
-            border-radius: 40px;
-            color: white;
-            font-family: 'Inter', sans-serif;
-            font-weight: 500;
-            font-size: 1rem;
-            cursor: pointer;
-            z-index: 110;
-            transition: all 0.2s ease;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            bottom: 90px;
-        }
-        .nieuws-knop:hover {
-            background: rgba(0, 0, 0, 0.8);
-            transform: translateX(-50%) scale(1.02);
-        }
-        @media (max-width: 768px) {
-            .nieuws-knop {
+            .plus-menu {
+                left: 16px;
                 bottom: 80px;
-                font-size: 0.85rem;
-                padding: 8px 16px;
             }
-            .nexi-logo {
-                width: 40px;
-                height: 40px;
-                top: 12px;
-                right: 12px;
-            }
-            .welcome-container {
-                top: 12px;
-                left: 12px;
+            .bot-avatar, .user-avatar {
+                width: 32px;
+                height: 32px;
             }
         }
     </style>
 </head>
 <body>
-    <div class="background-container">
-        <div id="bg1" class="background-image"></div>
-        <div id="bg2" class="background-image"></div>
+<div class="chat-app">
+    <div class="chat-header">
+        <h1>Nexi</h1>
     </div>
 
-    <!-- Klok -->
-    <div class="clock-container" id="clock">--:--</div>
+    <div class="messages-area" id="messagesArea"></div>
+
+    <div class="input-bar">
+        <button class="plus-btn" id="plusButton">➕</button>
+        <div class="text-input-wrapper">
+            <div class="chip-container" id="chipContainer"></div>
+            <input type="text" id="messageInput" placeholder="Typ je bericht...">
+            <button class="send-knop" id="sendButton">➤</button>
+        </div>
+    </div>
+
+    <div class="plus-menu" id="plusMenu">
+        <button class="menu-optie" data-action="toggleImageMode">Afbeeldingen zoeken</button>
+        <button class="menu-optie" data-action="toggleAnalysisMode">Analyse tonen</button>
+    </div>
+</div>
+
+<script>
+    // ==================== DATA STRUCTUREN ====================
+    let qaDatabase = [];
+    let imageDatabase = [];
+    let learnedQA = [];
     
-    <!-- Welkomstbericht -->
-    <div class="welcome-container" id="welcomeMsg"></div>
+    let imageModeActive = false;
+    let analysisModeActive = false;
+    let currentPlusMenuOpen = false;
+    let lastBotMessage = "";
     
-    <!-- Feitjes widget -->
-    <div class="facts-container" id="factsContainer">
-        <span id="factText">✨ Leuk feitje komt eraan...</span>
-    </div>
+    const messagesDiv = document.getElementById('messagesArea');
+    const messageInput = document.getElementById('messageInput');
+    const sendBtn = document.getElementById('sendButton');
+    const plusBtn = document.getElementById('plusButton');
+    const plusMenu = document.getElementById('plusMenu');
+    const chipContainer = document.getElementById('chipContainer');
     
-    <!-- Offline melding -->
-    <div class="offline-toast" id="offlineToast">
-        <span>⚠️</span>
-        <span>Whoops... je bent offline</span>
-    </div>
-
-    <!-- NIEUWS KNOPJE -->
-    <button class="nieuws-knop" id="nieuwsKnop">📰 Nieuws</button>
-
-    <!-- NEXI LOGO (alleen logo rechtsboven, klik opent nexi overlay) -->
-    <div class="nexi-logo" id="nexiLogo">
-        <img src="https://jimisdebest.github.io/nexi/logo.png" alt="Nexi" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ccircle cx=%2250%22 cy=%2250%22 r=%2245%22 fill=%22%234285F4%22/%3E%3Ctext x=%2250%22 y=%2265%22 text-anchor=%22middle%22 fill=%22white%22 font-size=%2240%22 font-weight=%22bold%22%3EN%3C/text%3E%3C/svg%3E';">
-    </div>
-
-    <div class="zoek-container">
-        <div class="zoek-wrapper">
-            <input type="text" id="zoekveld" class="zoekbalk" placeholder="Zoeken...">
-            <button id="zoek-knop" class="zoek-knop" aria-label="Zoeken">
-                <img id="zoekIcoon" src="zwartezoekknop.png" alt="Zoeken">
-            </button>
-        </div>
-        <ul id="suggesties-lijst" class="suggesties"></ul>
-        <div class="loading" id="loading">Bezig met laden...</div>
-        <div class="error" id="error"></div>
-    </div>
-
-    <button class="instellingen-knop" id="instellingenKnop">⚙️</button>
-
-    <div class="overlay" id="overlay"></div>
-
-    <div class="instellingen-menu" id="instellingenMenu">
-        <button class="menu-sluiten" id="menuSluiten">✕</button>
-        <h2>Instellingen</h2>
-        
-        <div class="setting-toggle">
-            <span>💡 Weetjes tonen</span>
-            <label class="toggle-switch">
-                <input type="checkbox" id="toggleFacts" checked>
-                <span class="toggle-slider"></span>
-            </label>
-        </div>
-        
-        <h3>Kies zoekmachine</h3>
-        <div class="zoekmachine-opties" id="zoekmachineOpties">
-            <div class="zoekmachine-optie" data-engine="google">
-                <input type="radio" name="zoekmachine" id="engineGoogle" value="google" checked>
-                <label for="engineGoogle">🔍 Google</label>
-            </div>
-            <div class="zoekmachine-optie" data-engine="bing">
-                <input type="radio" name="zoekmachine" id="engineBing" value="bing">
-                <label for="engineBing">🅱️ Bing</label>
-            </div>
-            <div class="zoekmachine-optie" data-engine="duckduckgo">
-                <input type="radio" name="zoekmachine" id="engineDuckDuckGo" value="duckduckgo">
-                <label for="engineDuckDuckGo">🦆 DuckDuckGo</label>
-            </div>
-            <div class="zoekmachine-optie" data-engine="yahoo">
-                <input type="radio" name="zoekmachine" id="engineYahoo" value="yahoo">
-                <label for="engineYahoo">📰 Yahoo</label>
-            </div>
-        </div>
-    </div>
-
-    <!-- NIEUWS OVERLAY (in-screen) -->
-    <div id="nieuwsOverlay" class="in-screen-overlay">
-        <div class="overlay-container">
-            <div class="overlay-header">
-                <button class="sluit-overlay" id="sluitNieuwsBtn">✕</button>
-            </div>
-            <iframe id="nieuwsIframe" class="overlay-iframe" src="https://jimisdebest.github.io/nieuws" title="Nieuws"></iframe>
-        </div>
-    </div>
-
-    <!-- NEXI OVERLAY (in-screen) -->
-    <div id="nexiOverlay" class="in-screen-overlay">
-        <div class="overlay-container">
-            <div class="overlay-header">
-                <button class="sluit-overlay" id="sluitNexiBtn">✕</button>
-            </div>
-            <iframe id="nexiIframe" class="overlay-iframe" src="https://jimisdebest.github.io/nexi" title="Nexi Chatbot"></iframe>
-        </div>
-    </div>
-
-    <script>
-        // ===== NAAM INSTELLEN =====
-        let userName = localStorage.getItem('userName');
-        
-        function askForName() {
-            if (!userName) {
-                userName = prompt('Welkom! Wat is je naam?', '');
-                if (userName && userName.trim()) {
-                    userName = userName.trim();
-                    localStorage.setItem('userName', userName);
-                } else {
-                    userName = 'bezoeker';
-                    localStorage.setItem('userName', userName);
-                }
-                updateWelcomeMessage();
-            }
-        }
-        
-        function updateWelcomeMessage() {
-            const now = new Date();
-            const hour = now.getHours();
-            let greeting = '';
-            
-            if (hour < 6) greeting = '🌙 Goedenacht';
-            else if (hour < 12) greeting = '🌅 Goedemorgen';
-            else if (hour < 18) greeting = '☀️ Goedemiddag';
-            else greeting = '🌙 Goedenavond';
-            
-            const welcomeDiv = document.getElementById('welcomeMsg');
-            welcomeDiv.textContent = `${greeting}, ${userName}!`;
-        }
-        
-        askForName();
-        updateWelcomeMessage();
-        setInterval(updateWelcomeMessage, 60000);
-        
-        // ===== FEITJES =====
-        let feitjes = [];
-        let factInterval = null;
-        let factsEnabled = true;
-        
-        async function laadFeitjes() {
-            try {
-                const response = await fetch('feitjes.txt');
-                if (!response.ok) throw new Error('Kan feitjes.txt niet laden');
-                const text = await response.text();
-                feitjes = text.trim().split('\n').filter(line => line.trim().length > 0);
-                startFactRotation();
-            } catch (err) {
-                document.getElementById('factText').textContent = '💡 Kon feitjes niet laden. Maak een bestand "feitjes.txt" aan.';
-            }
-        }
-        
-        function showRandomFact() {
-            if (!factsEnabled || feitjes.length === 0) return;
-            const randomIndex = Math.floor(Math.random() * feitjes.length);
-            const fact = feitjes[randomIndex];
-            document.getElementById('factText').textContent = `💡 ${fact}`;
-        }
-        
-        function startFactRotation() {
-            if (factInterval) clearInterval(factInterval);
-            if (factsEnabled && feitjes.length > 0) {
-                showRandomFact();
-                factInterval = setInterval(showRandomFact, 10000);
-            }
-        }
-        
-        function stopFactRotation() {
-            if (factInterval) {
-                clearInterval(factInterval);
-                factInterval = null;
-            }
-        }
-        
-        function toggleFacts(enable) {
-            factsEnabled = enable;
-            const factsContainer = document.getElementById('factsContainer');
-            if (enable) {
-                factsContainer.classList.remove('hidden');
-                startFactRotation();
-            } else {
-                factsContainer.classList.add('hidden');
-                stopFactRotation();
-            }
-            localStorage.setItem('factsEnabled', enable);
-        }
-        
-        const savedFactsEnabled = localStorage.getItem('factsEnabled');
-        if (savedFactsEnabled !== null) factsEnabled = savedFactsEnabled === 'true';
-        const toggleCheckbox = document.getElementById('toggleFacts');
-        toggleCheckbox.checked = factsEnabled;
-        toggleCheckbox.addEventListener('change', (e) => toggleFacts(e.target.checked));
-        laadFeitjes();
-        
-        // ===== ZOEKICOON THEMA =====
-        function updateZoekIcoon() {
-            const zoekIcoon = document.getElementById('zoekIcoon');
-            const isDonker = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            zoekIcoon.src = isDonker ? 'wittezoekknop.png' : 'zwartezoekknop.png';
-        }
-        updateZoekIcoon();
-        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', updateZoekIcoon);
-        
-        // ===== KLOK =====
-        function updateClock() {
-            const now = new Date();
-            const hours = now.getHours().toString().padStart(2, '0');
-            const minutes = now.getMinutes().toString().padStart(2, '0');
-            document.getElementById('clock').textContent = `${hours}:${minutes}`;
-        }
-        updateClock();
-        setInterval(updateClock, 1000);
-        
-        // ===== OFFLINE DETECTIE =====
-        const offlineToast = document.getElementById('offlineToast');
-        let wasOffline = false;
-        function updateOfflineStatus() {
-            if (!navigator.onLine) {
-                offlineToast.classList.add('show');
-                wasOffline = true;
-            } else if (wasOffline) {
-                offlineToast.classList.add('show');
-                const toastSpan = offlineToast.querySelector('span:last-child');
-                toastSpan.textContent = '✅ Je bent weer online!';
-                offlineToast.style.background = 'rgba(40, 167, 69, 0.95)';
-                setTimeout(() => {
-                    offlineToast.classList.remove('show');
-                    toastSpan.textContent = 'Whoops... je bent offline';
-                    offlineToast.style.background = 'rgba(220, 53, 69, 0.95)';
-                }, 3000);
-                wasOffline = false;
-            }
-        }
-        updateOfflineStatus();
-        window.addEventListener('online', updateOfflineStatus);
-        window.addEventListener('offline', updateOfflineStatus);
-        offlineToast.addEventListener('click', () => offlineToast.classList.remove('show'));
-        
-        // ===== ZOEKMACHINE, SUGGESTIES, ACHTERGROND =====
-        let suggesties = [];
-        let huidigeAchtergrond = 0;
-        let totaalAchtergronden = 10;
-        let isAanHetWisselen = false;
-        let zoekmachine = { type: 'google' };
-        
-        const zoekmachineUrls = {
-            google: 'https://www.google.com/search?q={q}',
-            bing: 'https://www.bing.com/search?q={q}',
-            duckduckgo: 'https://duckduckgo.com/?q={q}',
-            yahoo: 'https://search.yahoo.com/search?p={q}'
-        };
-        
-        const afbeeldingExtensies = ['.png', '.jpg', '.jpeg', '.gif', '.webp'];
-        
-        function laadInstellingen() {
-            const opgeslagen = localStorage.getItem('zoekmachineInstellingen');
-            if (opgeslagen) {
-                try {
-                    const instellingen = JSON.parse(opgeslagen);
-                    zoekmachine = instellingen;
-                    const radio = document.querySelector(`input[name="zoekmachine"][value="${zoekmachine.type}"]`);
-                    if (radio) radio.checked = true;
-                } catch (e) {}
-            }
-        }
-        
-        function opslaanInstellingen() {
-            localStorage.setItem('zoekmachineInstellingen', JSON.stringify(zoekmachine));
-        }
-        
-        function voerZoekopdrachtUit(query) {
-            if (!query) return;
-            const exacteMatch = suggesties.find(s => s.tekst.toLowerCase() === query.toLowerCase() && s.url);
-            if (exacteMatch) {
-                let url = exacteMatch.url;
-                if (url && !url.match(/^https?:\/\//i)) url = 'https://' + url;
-                window.location.href = url;
-                return;
-            }
-            const baseUrl = zoekmachineUrls[zoekmachine.type] || zoekmachineUrls.google;
-            window.location.href = baseUrl.replace('{q}', encodeURIComponent(query));
-        }
-        
-        function openMenu() {
-            document.getElementById('instellingenMenu').classList.add('active');
-            document.getElementById('overlay').classList.add('active');
-        }
-        function sluitMenu() {
-            document.getElementById('instellingenMenu').classList.remove('active');
-            document.getElementById('overlay').classList.remove('active');
-        }
-        
-        async function vindAfbeelding(basisNaam) {
-            for (const ext of afbeeldingExtensies) {
-                const url = basisNaam + ext;
-                try {
-                    const response = await fetch(url, { method: 'HEAD' });
-                    if (response.ok) return url;
-                } catch (e) {}
-            }
-            return null;
-        }
-        
-        function kiesRandomAchtergrond() {
-            return Math.floor(Math.random() * totaalAchtergronden) + 1;
-        }
-        
-        async function wisselAchtergrond() {
-            if (isAanHetWisselen) return;
-            isAanHetWisselen = true;
-            let nieuwNummer;
-            do {
-                nieuwNummer = kiesRandomAchtergrond();
-            } while (nieuwNummer === huidigeAchtergrond && totaalAchtergronden > 1);
-            const afbeeldingUrl = await vindAfbeelding(`${nieuwNummer}`);
-            if (afbeeldingUrl) {
-                const bg1 = document.getElementById('bg1');
-                const bg2 = document.getElementById('bg2');
-                const isBg1Active = bg1.classList.contains('active');
-                if (isBg1Active) {
-                    bg2.style.backgroundImage = `url('${afbeeldingUrl}')`;
-                    bg2.classList.add('active');
-                    bg1.classList.remove('active');
-                } else {
-                    bg1.style.backgroundImage = `url('${afbeeldingUrl}')`;
-                    bg1.classList.add('active');
-                    bg2.classList.remove('active');
-                }
-                huidigeAchtergrond = nieuwNummer;
-            }
-            isAanHetWisselen = false;
-        }
-        
-        function startAchtergrondRotatie() {
-            setTimeout(async () => {
-                for (let i = 1; i <= totaalAchtergronden; i++) {
-                    const afbeeldingUrl = await vindAfbeelding(`${i}`);
-                    if (afbeeldingUrl) {
-                        document.getElementById('bg1').style.backgroundImage = `url('${afbeeldingUrl}')`;
-                        document.getElementById('bg1').classList.add('active');
-                        huidigeAchtergrond = i;
-                        break;
+    // ==================== DATA LADEN ====================
+    async function loadReacties() {
+        try {
+            const response = await fetch('https://raw.githubusercontent.com/jimisdebest/nexi/main/reacties.txt');
+            if (!response.ok) throw new Error('reacties niet gevonden');
+            const text = await response.text();
+            const lines = text.split('\n');
+            for (let line of lines) {
+                line = line.trim();
+                if (line.includes('=')) {
+                    let [vraag, antwoord] = line.split('=').map(part => part.trim());
+                    if (vraag && antwoord) {
+                        qaDatabase.push({
+                            vraag: vraag.toLowerCase(),
+                            antwoord: antwoord,
+                            containsHtml: antwoord.includes('<img') || antwoord.includes('<br'),
+                            bron: 'reacties.txt'
+                        });
                     }
                 }
-                setInterval(() => wisselAchtergrond(), 10000);
-            }, 500);
+            }
+            console.log(`✅ Geladen: ${qaDatabase.length} reacties`);
+        } catch (err) {
+            console.warn('Kan reacties.txt niet laden', err);
         }
-        
-        async function laadSuggesties() {
-            const loading = document.getElementById('loading');
-            const error = document.getElementById('error');
-            try {
-                loading.style.display = 'block';
-                const response = await fetch('zoeksuggesties.txt');
-                if (!response.ok) throw new Error('Kan zoeksuggesties.txt niet laden');
-                const text = await response.text();
-                const regels = text.trim().split('\n');
-                suggesties = regels.map(regel => {
-                    if (!regel.trim()) return null;
-                    const eersteGelijkteken = regel.indexOf('=');
-                    if (eersteGelijkteken !== -1) {
-                        const tekst = regel.substring(0, eersteGelijkteken).trim();
-                        let url = regel.substring(eersteGelijkteken + 1).trim();
-                        if (url && !url.match(/^https?:\/\//i)) url = 'https://' + url;
-                        return { tekst, url };
-                    } else {
-                        return { tekst: regel.trim(), url: null };
+    }
+    
+    async function loadPlaatjes() {
+        try {
+            const response = await fetch('https://raw.githubusercontent.com/Jimisdebest/nexi/main/plaatjes.txt');
+            if (!response.ok) throw new Error('plaatjes niet gevonden');
+            const text = await response.text();
+            const lines = text.split('\n');
+            for (let line of lines) {
+                line = line.trim();
+                if (line.includes('=')) {
+                    let [keyword, url] = line.split('=').map(part => part.trim());
+                    if (keyword && url && url.startsWith('http')) {
+                        imageDatabase.push({ keyword: keyword.toLowerCase(), url: url });
                     }
-                }).filter(s => s !== null);
-                loading.style.display = 'none';
-            } catch (err) {
-                loading.style.display = 'none';
-                error.style.display = 'block';
-                error.textContent = `Fout: ${err.message}`;
+                }
+            }
+            console.log(`Geladen: ${imageDatabase.length} afbeeldingen`);
+        } catch (err) {
+            console.warn('Kan plaatjes.txt niet laden', err);
+        }
+    }
+    
+    function loadLearnedFromStorage() {
+        const stored = localStorage.getItem('nexi_learned_qa');
+        if (stored) {
+            learnedQA = JSON.parse(stored);
+            console.log(`Geladen uit localStorage: ${learnedQA.length} geleerde reacties (niet zichtbaar voor gebruiker)`);
+        }
+    }
+    
+    function saveLearnedToStorage() {
+        localStorage.setItem('nexi_learned_qa', JSON.stringify(learnedQA));
+    }
+    
+    // ==================== GEAVANCEERD MATCHING SYSTEEM ====================
+    function calculateAdvancedRelevanceScore(userMessage, candidateQuestion) {
+        const userLower = userMessage.toLowerCase();
+        const candidateLower = candidateQuestion.toLowerCase();
+        
+        if (userLower === candidateLower) return 1.0;
+        
+        const userWords = userLower.split(/\s+/).filter(w => w.length > 1);
+        const candidateWords = candidateLower.split(/\s+/).filter(w => w.length > 1);
+        
+        if (userWords.length === 0 || candidateWords.length === 0) return 0;
+        
+        let exactMatches = 0;
+        let partialMatches = 0;
+        
+        for (let uw of userWords) {
+            for (let cw of candidateWords) {
+                if (uw === cw) {
+                    exactMatches++;
+                    break;
+                } else if (cw.includes(uw) || uw.includes(cw)) {
+                    partialMatches += 0.5;
+                    break;
+                }
             }
         }
         
-        function zoekSuggesties(input) {
-            if (!input || suggesties.length === 0) return [];
-            input = input.toLowerCase();
-            return suggesties.filter(s => s.tekst.toLowerCase().includes(input)).slice(0, 10);
+        const wordOverlap = (exactMatches + partialMatches) / Math.max(userWords.length, candidateWords.length);
+        
+        let charOverlap = 0;
+        const minLen = Math.min(userLower.length, candidateLower.length);
+        for (let i = 0; i < minLen; i++) {
+            if (userLower[i] === candidateLower[i]) charOverlap++;
+        }
+        const charScore = charOverlap / Math.max(userLower.length, candidateLower.length);
+        
+        const lengthFactor = Math.min(1, userWords.length / 8) * 0.1;
+        
+        let score = (wordOverlap * 0.7) + (charScore * 0.2) + lengthFactor;
+        
+        if (exactMatches >= 2) score += 0.15;
+        if (exactMatches >= 3) score += 0.1;
+        
+        return Math.min(score, 1.0);
+    }
+    
+    function findBestMatchFromDatabase(database, userMessage) {
+        const lowerMsg = userMessage.toLowerCase();
+        let bestMatch = null;
+        let bestScore = 0;
+        
+        for (let item of database) {
+            let score = calculateAdvancedRelevanceScore(lowerMsg, item.vraag);
+            if (lowerMsg === item.vraag) score = 1.0;
+            if (score > bestScore) {
+                bestScore = score;
+                bestMatch = item;
+            }
         }
         
-        function toonSuggesties(suggestieLijst) {
-            const lijst = document.getElementById('suggesties-lijst');
-            if (suggestieLijst.length === 0) {
-                lijst.style.display = 'none';
-                return;
+        return { match: bestMatch, score: bestScore };
+    }
+    
+    function findBestImageMatch(userMessage) {
+        if (imageDatabase.length === 0) return null;
+        
+        const lowerMsg = userMessage.toLowerCase();
+        let bestMatch = null;
+        let bestScore = 0;
+        
+        for (let img of imageDatabase) {
+            let score = calculateAdvancedRelevanceScore(lowerMsg, img.keyword);
+            if (lowerMsg.includes(img.keyword)) score += 0.2;
+            if (score > bestScore) {
+                bestScore = score;
+                bestMatch = img;
             }
-            lijst.innerHTML = '';
-            suggestieLijst.forEach(suggestie => {
-                const li = document.createElement('li');
-                li.textContent = suggestie.tekst + (suggestie.url ? ' →' : '');
-                li.onclick = () => {
-                    document.getElementById('zoekveld').value = suggestie.tekst;
-                    if (suggestie.url) {
-                        let url = suggestie.url;
-                        if (url && !url.match(/^https?:\/\//i)) url = 'https://' + url;
-                        window.location.href = url;
-                    } else {
-                        voerZoekopdrachtUit(suggestie.tekst);
-                    }
-                    lijst.style.display = 'none';
+        }
+        
+        if (imageModeActive && bestMatch) return bestMatch;
+        if (bestMatch && bestScore >= 0.25) return bestMatch;
+        if (imageModeActive && imageDatabase.length > 0) return imageDatabase[0];
+        return null;
+    }
+    
+    // ==================== LEER VAN CONVERSATIE (STIL, NOOIT TONEN) ====================
+    function learnFromConversation(botMessage, userResponse) {
+        if (!botMessage || !userResponse) return false;
+        
+        // Extract pure text from bot message
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = botMessage;
+        const cleanBotMessage = tempDiv.textContent || tempDiv.innerText || botMessage;
+        
+        if (cleanBotMessage.length < 3 || userResponse.length < 1) return false;
+        
+        const lowerQuestion = cleanBotMessage.toLowerCase().trim();
+        
+        // Check if already exists in any database
+        const existsInLearned = learnedQA.some(qa => qa.vraag === lowerQuestion);
+        const existsInBase = qaDatabase.some(qa => qa.vraag === lowerQuestion);
+        
+        if (existsInLearned || existsInBase) return false;
+        
+        // Add to learned database
+        learnedQA.push({
+            vraag: lowerQuestion,
+            antwoord: userResponse,
+            containsHtml: false,
+            timestamp: new Date().toISOString(),
+            bron: 'geleerd'
+        });
+        
+        saveLearnedToStorage();
+        
+        // Silent learning - no message shown to user
+        console.log(`Stil geleerd: "${cleanBotMessage.substring(0, 40)}..." = "${userResponse.substring(0, 40)}..."`);
+        
+        return true;
+    }
+    
+    // ==================== BESTE ANTWOORD KIEZEN ====================
+    async function getBestResponse(userMessage) {
+        const steps = [];
+        let bestResponse = null;
+        let bestScore = 0;
+        let responseSource = null;
+        
+        // Stap 1: Zoek in geleerde QA
+        steps.push({ text: "Zoeken in geleerde conversaties...", success: null });
+        const learnedResult = findBestMatchFromDatabase(learnedQA, userMessage);
+        if (learnedResult.match) {
+            bestResponse = learnedResult.match;
+            bestScore = learnedResult.score;
+            responseSource = `geleerd (${Math.round(bestScore * 100)}% match)`;
+            steps[steps.length - 1] = { text: `✓ Geleerde match: ${Math.round(bestScore * 100)}% relevantie`, success: true };
+        } else {
+            steps[steps.length - 1] = { text: "Geen conversaties gevonden", success: false };
+        }
+        
+        // Stap 2: Zoek in reacties.txt
+        steps.push({ text: "Zoeken in reacties.txt...", success: null });
+        const qaResult = findBestMatchFromDatabase(qaDatabase, userMessage);
+        if (qaResult.match && (!bestResponse || qaResult.score > bestScore)) {
+            bestResponse = qaResult.match;
+            bestScore = qaResult.score;
+            responseSource = `reacties.txt (${Math.round(bestScore * 100)}% match)`;
+            steps[steps.length - 1] = { text: `✓ Reactie gevonden: ${Math.round(bestScore * 100)}% relevantie`, success: true };
+        } else if (qaResult.match) {
+            steps[steps.length - 1] = { text: `Reactie gevonden maar minder relevant (${Math.round(qaResult.score * 100)}%)`, success: false };
+        } else {
+            steps[steps.length - 1] = { text: "Geen passende reactie gevonden", success: false };
+        }
+        
+        // Stap 3: Afbeeldingen zoeken
+        const imageMatch = findBestImageMatch(userMessage);
+        const isImageRequest = userMessage.toLowerCase().includes('afbeelding') || 
+                               userMessage.toLowerCase().includes('foto') || 
+                               userMessage.toLowerCase().includes('plaatje') ||
+                               userMessage.toLowerCase().includes('toon') ||
+                               userMessage.toLowerCase().includes('zie je');
+        
+        if (imageModeActive || (imageMatch && (isImageRequest || bestScore < 0.5))) {
+            steps.push({ text: "Zoeken naar afbeelding...", success: null });
+            if (imageMatch) {
+                const imageScore = calculateAdvancedRelevanceScore(userMessage, imageMatch.keyword);
+                steps[steps.length - 1] = { text: `Afbeelding gevonden: "${imageMatch.keyword}" (${Math.round(imageScore * 100)}% match)`, success: true };
+                const imageHtml = `<div><img src="${imageMatch.url}" class="generated-image" alt="${imageMatch.keyword}" loading="lazy"><br><span style="font-size:0.7rem; opacity:0.7;">🔍 ${imageMatch.keyword}</span></div>`;
+                return { 
+                    answer: imageHtml, 
+                    isHtml: true, 
+                    steps, 
+                    source: `afbeelding (${Math.round(imageScore * 100)}% match)`,
+                    score: imageScore
                 };
-                lijst.appendChild(li);
-            });
-            lijst.style.display = 'block';
+            } else {
+                steps[steps.length - 1] = { text: "✗ Geen afbeelding gevonden", success: false };
+            }
         }
         
-        // ===== NIEUWS OVERLAY FUNCTIES =====
-        const nieuwsOverlay = document.getElementById('nieuwsOverlay');
-        const nieuwsKnop = document.getElementById('nieuwsKnop');
-        const sluitNieuwsBtn = document.getElementById('sluitNieuwsBtn');
+        // Stap 4: Gebruik beste gevonden antwoord
+        if (bestResponse) {
+            steps.push({ text: `Beste antwoord gekozen uit ${responseSource}`, success: true });
+            return { 
+                answer: bestResponse.antwoord, 
+                isHtml: bestResponse.containsHtml || false, 
+                steps, 
+                source: responseSource,
+                score: bestScore
+            };
+        }
         
-        function openNieuws() { nieuwsOverlay.classList.add('active'); }
-        function closeNieuws() { nieuwsOverlay.classList.remove('active'); }
-        
-        nieuwsKnop.addEventListener('click', openNieuws);
-        sluitNieuwsBtn.addEventListener('click', closeNieuws);
-        nieuwsOverlay.addEventListener('click', (e) => { if (e.target === nieuwsOverlay) closeNieuws(); });
-        
-        // ===== NEXI OVERLAY FUNCTIES (logo opent nexi in-screen) =====
-        const nexiOverlay = document.getElementById('nexiOverlay');
-        const nexiLogoDiv = document.getElementById('nexiLogo');
-        const sluitNexiBtn = document.getElementById('sluitNexiBtn');
-        
-        function openNexi() { nexiOverlay.classList.add('active'); }
-        function closeNexi() { nexiOverlay.classList.remove('active'); }
-        
-        nexiLogoDiv.addEventListener('click', openNexi);
-        sluitNexiBtn.addEventListener('click', closeNexi);
-        nexiOverlay.addEventListener('click', (e) => { if (e.target === nexiOverlay) closeNexi(); });
-        
-        // ESC to close any active overlay
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                if (nieuwsOverlay.classList.contains('active')) closeNieuws();
-                if (nexiOverlay.classList.contains('active')) closeNexi();
-                if (document.getElementById('instellingenMenu').classList.contains('active')) sluitMenu();
+        // Fallback - altijd een antwoord
+        steps.push({ text: "Genereren van uniek antwoord...", success: true });
+        const fallbackAnswer = `Ik heb je vraag "${userMessage}" geanalyseerd. Hoewel ik geen exact antwoord heb in mijn database, help ik je graag verder! Kun je iets specifieker zijn?`;
+        return { answer: fallbackAnswer, isHtml: false, steps, source: 'generated', score: 0 };
+    }
+    
+    // ==================== UI FUNCTIES ====================
+    function addUserMessage(text) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'message-user';
+        wrapper.innerHTML = `
+            <div class="user-avatar"><img src="mens.png" alt="Gebruiker" onerror="this.src='jimisdebest.github.io/nexi/mens.png"></div>
+            <div class="bubble-user">${escapeHtml(text)}</div>
+        `;
+        messagesDiv.appendChild(wrapper);
+        scrollToBottom();
+    }
+    
+    function addBotMessage(text, isHtml = false) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'message-bot';
+        wrapper.innerHTML = `
+            <div class="bot-avatar"><img src="logo.png" alt="Nexi logo" onerror="jimisdebest.github.io/nexi/logo.png"></div>
+            <div class="bubble-bot"></div>
+        `;
+        const bubble = wrapper.querySelector('.bubble-bot');
+        if (isHtml) {
+            bubble.innerHTML = text;
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = text;
+            lastBotMessage = tempDiv.textContent || tempDiv.innerText || text;
+        } else {
+            bubble.textContent = text;
+            lastBotMessage = text;
+        }
+        messagesDiv.appendChild(wrapper);
+        scrollToBottom();
+    }
+    
+    function addAnalysisMessage(steps) {
+        if (!analysisModeActive) return;
+        const analysisDiv = document.createElement('div');
+        analysisDiv.className = 'analysis-message';
+        for (let step of steps) {
+            const stepDiv = document.createElement('div');
+            stepDiv.className = 'analysis-step';
+            const checkSpan = document.createElement('span');
+            checkSpan.className = 'check';
+            if (step.success === true) {
+                checkSpan.classList.add('success');
+                checkSpan.textContent = '✓';
+            } else if (step.success === false) {
+                checkSpan.classList.add('error');
+                checkSpan.textContent = '✗';
+            } else {
+                checkSpan.classList.add('pending');
+                checkSpan.textContent = '…';
             }
-            if (e.ctrlKey && e.key === 'i') {
-                e.preventDefault();
-                if (document.getElementById('instellingenMenu').classList.contains('active')) sluitMenu();
-                else openMenu();
+            const textSpan = document.createElement('span');
+            textSpan.textContent = step.text;
+            stepDiv.appendChild(checkSpan);
+            stepDiv.appendChild(textSpan);
+            analysisDiv.appendChild(stepDiv);
+        }
+        messagesDiv.appendChild(analysisDiv);
+        scrollToBottom();
+    }
+    
+    function showThinking() {
+        const thinkDiv = document.createElement('div');
+        thinkDiv.className = 'message-bot';
+        thinkDiv.id = 'tempThinking';
+        thinkDiv.innerHTML = `
+            <div class="bot-avatar"><img src="logo.png" alt="Nexi logo" onerror="this.src='jimisdebest.github.io/nexi/logo.png"></div>
+            <div class="bubble-bot thinking-bubble">Nexi zoekt het beste antwoord...</div>
+        `;
+        messagesDiv.appendChild(thinkDiv);
+        scrollToBottom();
+        return thinkDiv;
+    }
+    
+    function removeThinking(element) {
+        if (element && element.remove) element.remove();
+    }
+    
+    function scrollToBottom() {
+        setTimeout(() => {
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }, 50);
+    }
+    
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+    
+    // ==================== MODUS UI ====================
+    function updateChips() {
+        chipContainer.innerHTML = '';
+        if (imageModeActive) {
+            const chip = document.createElement('div');
+            chip.className = 'mode-chip';
+            chip.innerHTML = `Afbeeldingen zoeken <span class="remove">✕</span>`;
+            chip.querySelector('.remove').addEventListener('click', () => {
+                imageModeActive = false;
+                updateChips();
+                addBotMessage("Afbeeldingen-modus uitgeschakeld.", false);
+            });
+            chipContainer.appendChild(chip);
+        }
+        if (analysisModeActive) {
+            const chip = document.createElement('div');
+            chip.className = 'mode-chip';
+            chip.innerHTML = `Analyse tonen <span class="remove">✕</span>`;
+            chip.querySelector('.remove').addEventListener('click', () => {
+                analysisModeActive = false;
+                updateChips();
+                addBotMessage("Analyse-modus uitgeschakeld.", false);
+            });
+            chipContainer.appendChild(chip);
+        }
+    }
+    
+    function toggleImageMode() {
+        imageModeActive = !imageModeActive;
+        updateChips();
+        addBotMessage(imageModeActive ? "Ik zoek nu afbeeldingen." : "Ik zoek nu geen afbeeldingen.", false);
+        closePlusMenu();
+    }
+    
+    function toggleAnalysisMode() {
+        analysisModeActive = !analysisModeActive;
+        updateChips();
+        addBotMessage(analysisModeActive ? "Mijn analyse is nu zichtbaar." : "Mijn analyse is nu niet zichtbaar.", false);
+        closePlusMenu();
+    }
+    
+    // ==================== PLUS MENU ====================
+    function openPlusMenu() {
+        plusMenu.classList.add('open');
+        currentPlusMenuOpen = true;
+    }
+    
+    function closePlusMenu() {
+        plusMenu.classList.remove('open');
+        currentPlusMenuOpen = false;
+    }
+    
+    function togglePlusMenu() {
+        if (currentPlusMenuOpen) closePlusMenu();
+        else openPlusMenu();
+    }
+    
+    // ==================== HOOFD AFHANDELING ====================
+    async function handleSend() {
+        const message = messageInput.value.trim();
+        if (message === "") return;
+        
+        addUserMessage(message);
+        messageInput.value = "";
+        
+        // Leer van de vorige bot reactie (stil, wordt niet getoond)
+        if (lastBotMessage) {
+            learnFromConversation(lastBotMessage, message);
+        }
+        
+        const thinking = showThinking();
+        
+        setTimeout(async () => {
+            removeThinking(thinking);
+            const response = await getBestResponse(message);
+            addBotMessage(response.answer, response.isHtml);
+            if (response.steps && response.steps.length > 0) {
+                addAnalysisMessage(response.steps);
+            }
+        }, 400);
+    }
+    
+    // ==================== INITIALISATIE ====================
+    async function init() {
+        await Promise.all([loadReacties(), loadPlaatjes()]);
+        loadLearnedFromStorage();
+        updateChips();
+        
+        sendBtn.addEventListener('click', handleSend);
+        messageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') handleSend();
+        });
+        plusBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            togglePlusMenu();
+        });
+        
+        document.querySelectorAll('.menu-optie').forEach(opt => {
+            opt.addEventListener('click', (e) => {
+                const action = opt.getAttribute('data-action');
+                if (action === 'toggleImageMode') toggleImageMode();
+                if (action === 'toggleAnalysisMode') toggleAnalysisMode();
+                closePlusMenu();
+            });
+        });
+        
+        document.addEventListener('click', (event) => {
+            if (!plusBtn.contains(event.target) && !plusMenu.contains(event.target)) {
+                if (currentPlusMenuOpen) closePlusMenu();
             }
         });
         
-        document.addEventListener('DOMContentLoaded', () => {
-            laadInstellingen();
-            laadSuggesties();
-            startAchtergrondRotatie();
-            
-            const zoekveld = document.getElementById('zoekveld');
-            const suggestiesLijst = document.getElementById('suggesties-lijst');
-            const zoekKnop = document.getElementById('zoek-knop');
-            const instellingenKnop = document.getElementById('instellingenKnop');
-            const menuSluiten = document.getElementById('menuSluiten');
-            const overlay = document.getElementById('overlay');
-            
-            instellingenKnop.addEventListener('click', openMenu);
-            menuSluiten.addEventListener('click', sluitMenu);
-            overlay.addEventListener('click', sluitMenu);
-            
-            const radioButtons = document.querySelectorAll('input[name="zoekmachine"]');
-            radioButtons.forEach(radio => {
-                radio.addEventListener('change', (e) => {
-                    if (e.target.checked) {
-                        zoekmachine.type = e.target.value;
-                        opslaanInstellingen();
-                    }
-                });
-            });
-            
-            zoekveld.addEventListener('input', (e) => toonSuggesties(zoekSuggesties(e.target.value)));
-            zoekKnop.addEventListener('click', () => voerZoekopdrachtUit(zoekveld.value));
-            zoekveld.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') voerZoekopdrachtUit(zoekveld.value);
-            });
-            
-            document.addEventListener('click', (e) => {
-                if (!zoekveld.contains(e.target) && !suggestiesLijst.contains(e.target)) {
-                    suggestiesLijst.style.display = 'none';
-                }
-            });
-            
-            zoekveld.addEventListener('focus', () => {
-                if (zoekveld.value && suggesties.length > 0) {
-                    toonSuggesties(zoekSuggesties(zoekveld.value));
-                }
-            });
-        });
-    </script>
+        addBotMessage("Hey! Hoe is het ermee? Vraag me alles, ik ben hier om je te helpen.", false);
+    }
+    
+    init();
+</script>
 </body>
 </html>
