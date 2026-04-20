@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Start</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            width: 100%;
+            /* ALTIJD de vaste achtergrond.png, gecentreerd en bedekkend */
+            background: url('achtergrond.png') center center / cover no-repeat fixed;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Container voor de zoekbalk - mooie centrering */
+        .search-container {
+            width: 100%;
+            max-width: 680px;
+            margin: 0 24px;
+            padding: 0;
+        }
+
+        /* HALF DOORZICHTIGE, GEBLURDE ZOEKBALK - modern glassmorphism effect */
+        .search-bar {
+            width: 100%;
+            padding: 18px 28px;
+            font-size: 18px;
+            font-family: inherit;
+            font-weight: 450;
+            border: none;
+            border-radius: 80px;
+            /* Halfdoorzichtig + blur effect */
+            background: rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            /* TEXT KLEUR: ZWART (zoals gevraagd) */
+            color: #000000;
+            outline: none;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+            transition: all 0.2s ease;
+            /* zachte rand voor definitie, maar geen harde border */
+            border: 1px solid rgba(255, 255, 255, 0.25);
+        }
+
+        /* Focus effect: behoud zwarte tekst, iets meer contrast achtergrond */
+        .search-bar:focus {
+            background: rgba(255, 255, 255, 0.55);
+            backdrop-filter: blur(16px);
+            border-color: rgba(255, 255, 255, 0.6);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
+            color: #000000;
+        }
+
+        /* Placeholder volledig transparant (geen vaste tekst) */
+        .search-bar::placeholder {
+            color: transparent;
+        }
+        .search-bar::-webkit-input-placeholder { color: transparent; }
+        .search-bar::-moz-placeholder { color: transparent; }
+        .search-bar:-ms-input-placeholder { color: transparent; }
+        .search-bar::placeholder { color: transparent; }
+
+        /* Responsief: op kleinere schermen past de padding en font zich aan */
+        @media (max-width: 640px) {
+            .search-bar {
+                padding: 14px 24px;
+                font-size: 16px;
+            }
+            .search-container {
+                margin: 0 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .search-bar {
+                padding: 12px 20px;
+                font-size: 15px;
+            }
+            .search-container {
+                margin: 0 16px;
+            }
+        }
+
+        /* Geen extra elementen, geen tekst, geen footer, geen enkele afleiding.
+           Alleen de prachtige halfdoorzichtige geblurde zoekbalk met zwarte tekst */
+    </style>
+</head>
+<body>
+
+<div class="search-container">
+    <input type="text" id="mainSearch" class="search-bar" value="" autofocus>
+</div>
+
+<script>
+    (function() {
+        // Uiterst minimalistische functionaliteit:
+        // - Geen instellingen, geen tijd/datum/weetjes/nexi/nieuws
+        // - Altijd zoeken op Bing
+        // - Website intypen (domein/URL) -> openen in NIEUW TABBLAD
+        // - Zoekopdracht -> altijd Bing (zelfde tab)
+        // - Getypte tekst is ZWART (via CSS)
+        // - Achtergrond.png is altijd aanwezig via CSS
+        // - Werkt perfect op alle schermformaten
+        
+        const searchInput = document.getElementById('mainSearch');
+        
+        // Controleer of invoer een echte website/URL is (geen algemene zoekterm)
+        function isWebsiteUrl(invoer) {
+            if (!invoer || typeof invoer !== 'string') return false;
+            let trimmed = invoer.trim();
+            if (trimmed === "") return false;
+            
+            // Patronen voor echte websites/domeinen (inclusief subdomeinen, paden)
+            const domeinMetExtensie = /^([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(:\d+)?(\/.*)?$/;
+            const urlMetProtocol = /^(https?:\/\/)([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(:\d+)?(\/.*)?$/i;
+            const localhostPattern = /^(https?:\/\/)?(localhost|127\.0\.0\.1)(:\d+)?(\/.*)?$/i;
+            const wwwPatroon = /^www\.[a-zA-Z0-9-]+(\.[a-zA-Z]{2,})+(:\d+)?(\/.*)?$/;
+            
+            if (domeinMetExtensie.test(trimmed) || urlMetProtocol.test(trimmed) || localhostPattern.test(trimmed) || wwwPatroon.test(trimmed)) {
+                return true;
+            }
+            return false;
+        }
+        
+        // Maak volledige URL (https:// voorvoegsel indien nodig)
+        function normaliseerUrl(invoer) {
+            let url = invoer.trim();
+            if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                url = 'https://' + url;
+            }
+            return url;
+        }
+        
+        // Hoofdactie bij Enter
+        function handleSubmit() {
+            let rawValue = searchInput.value;
+            if (!rawValue || rawValue.trim() === "") {
+                searchInput.focus();
+                return;
+            }
+            
+            let input = rawValue.trim();
+            
+            // 1) Check of het een website is (geen zoekopdracht)
+            if (isWebsiteUrl(input)) {
+                // Website: openen in NIEUW TABBLAD
+                let destination = normaliseerUrl(input);
+                window.open(destination, '_blank', 'noopener,noreferrer');
+                // Behoud focus, selecteer tekst voor gemak
+                searchInput.select();
+                searchInput.focus();
+            } 
+            else {
+                // 2) Altijd zoeken op BING (zoals vereist)
+                const bingSearchUrl = `https://www.bing.com/search?q=${encodeURIComponent(input)}`;
+                window.location.href = bingSearchUrl;
+            }
+        }
+        
+        // Enter-toets afhandeling
+        searchInput.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                handleSubmit();
+            }
+        });
+        
+        // Focus bij laden
+        searchInput.focus();
+        
+        // Er is GEEN extra code voor klok, datum, feitjes, nieuws, nexi, instellingen.
+        // Alleen pure zoekfunctionaliteit + prachtige halfdoorzichtige geblurde zoekbalk met zwarte tekst.
+        // Achtergrond.png wordt altijd getoond.
+    })();
+</script>
+</body>
+</html>
